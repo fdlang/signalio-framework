@@ -19,12 +19,14 @@ class PlatformConnector():
         except:  Lanza un excepción si hay algun error al conectar con la plataforma
         Returns: None 
         """
-        api_key = os.getenv('api_key')
-        secret_key = os.getenv('secret_key')
-        client = Client(api_key, secret_key, testnet=True) # testnet = cuenta para puebas si es true
+        api_key = os.getenv('testnet_api_key')
+        secret_key = os.getenv('testnet_secret_key')
+        self.client = Client(api_key, secret_key, testnet=True)
+
+        self.client.API_URL = "https://testnet.binance.vision/api"  # se establece url para api de pruebas "testnet"
 
         try:
-            client_status = client.get_account_status()
+            client_status = self.client.get_account_status()
             status_value = client_status['data']
 
             if status_value == 'Normal':
@@ -38,4 +40,10 @@ class PlatformConnector():
             print(f'Error inesperado: {e}')
 
     def _live_account_warning(self) -> None:
-        Client.get_account()  # revisar en que cuenta esta si live o pruebas
+
+        if "https://testnet.binance.vision/api" in self.client.API_URL:
+            print('WARNING !!! Estas en el entorno Live.')
+            print('Base URL: ', self.client.API_URL)
+        else:
+            print("Estas en un entorno de pruebas.")
+            print('Base URL: ', self.client.API_URL)

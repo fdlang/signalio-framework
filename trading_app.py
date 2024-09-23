@@ -1,6 +1,6 @@
 from platform_connector.plaform_connector import PlatformConnector
 
 if __name__ == "__main__":
-    CONNECT = PlatformConnector()
 
+    CONNECT = PlatformConnector()
     CONNECT._live_account_warning()
