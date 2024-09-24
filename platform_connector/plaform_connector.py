@@ -11,6 +11,9 @@ class PlatformConnector():
 
         # Inicialización de la plataforma
         self._initialize_platform()
+
+        # Comprueba el tipo de cuenta 
+        self._live_account_warning()
     
     def _initialize_platform(self):
         """ 
@@ -40,10 +43,22 @@ class PlatformConnector():
             print(f'Error inesperado: {e}')
 
     def _live_account_warning(self) -> None:
+        """
+        Lanza una advertencia si el tipo de cuenta es live
+        """
 
-        if "https://testnet.binance.vision/api" in self.client.API_URL:
-            print('WARNING !!! Estas en el entorno Live.')
-            print('Base URL: ', self.client.API_URL)
+        if "https://api.binance.com/api" in self.client.API_URL:
+            if not input('ALERTA! Cuenta de tipo REAL detectada. Capital en riesgo. ¿Deseas continuar? (y/n):').lower() == 'y':
+                print('Base URL: ', self.client.API_URL)
+                # BUSCAR EN LA API LA SALIDA PARA EL CIERRE DE SESION
+                raise Exception("El usuario ha DETENIDO la conexion.")
+            
         else:
-            print("Estas en un entorno de pruebas.")
+            print("Estas en un entorno de pruebas (DEMO).")
             print('Base URL: ', self.client.API_URL)
+
+        account_info = self.client.get_account()
+
+        if 'accountType' in account_info:
+            account_type = account_info['accountType']
+            print(f'El tipo de cuenta es: {account_type}')
