@@ -50,7 +50,11 @@ class PlatformConnector():
         if "https://api.binance.com/api" in self.client.API_URL:
             if not input('ALERTA! Cuenta de tipo REAL detectada. Capital en riesgo. ¿Deseas continuar? (y/n):').lower() == 'y':
                 print('Base URL: ', self.client.API_URL)
-                # BUSCAR EN LA API LA SALIDA PARA EL CIERRE DE SESION
+
+
+                # BUSCAR EN LA API LA FUNCION PARA EL CIERRE DE SESION
+
+
                 raise Exception("El usuario ha DETENIDO la conexion.")
             
         else:
