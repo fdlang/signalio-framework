@@ -8,28 +8,28 @@ class PlatformConnector():
 
         # busca el archivo .env y carga sus valores
         load_dotenv(find_dotenv())
+        self.api_key = os.getenv('api_key')
+        self.secret_key = os.getenv('secret_key')
 
         # Inicialización de la plataforma
-        self._initialize_platform()
+        self.client = self._initialize_platform()
 
         # Comprueba el tipo de cuenta 
         self._live_account_warning()
     
+
     def _initialize_platform(self):
         """ 
         Conexión con la plataforma de Binance
         
         except:  Lanza un excepción si hay algun error al conectar con la plataforma
-        Returns: None 
+        Returns: Cliente de Binance 
         """
-        api_key = os.getenv('testnet_api_key')
-        secret_key = os.getenv('testnet_secret_key')
-        self.client = Client(api_key, secret_key, testnet=True)
 
-        self.client.API_URL = "https://testnet.binance.vision/api"  # se establece url para api de pruebas "testnet"
+        client = Client(self.api_key, self.secret_key)
 
         try:
-            client_status = self.client.get_account_status()
+            client_status = client.get_account_status()
             status_value = client_status['data']
 
             if status_value == 'Normal':
@@ -37,32 +37,64 @@ class PlatformConnector():
         
         except BinanceAPIException as e:
             print(f'Error de la API de Binance: {e}')
+            return None
         except BinanceRequestException as e:
             print(f'Error de conexión: {e}')
+            return None
         except Exception as e:
             print(f'Error inesperado: {e}')
+            return None
+        
+        return client
+
 
     def _live_account_warning(self) -> None:
         """
-        Lanza una advertencia si el tipo de cuenta es live
+        Lanza una advertencia si el tipo de cuenta es live.
+        Si el usuario no desea continuar, cambia la cuenta a la testnet.
         """
 
+        if self.client is None:
+            print("Error: Cliente de Binance no inicializado correctamente.")
+            return
+
         if "https://api.binance.com/api" in self.client.API_URL:
-            if not input('ALERTA! Cuenta de tipo REAL detectada. Capital en riesgo. ¿Deseas continuar? (y/n):').lower() == 'y':
-                print('Base URL: ', self.client.API_URL)
-
-
-                # BUSCAR EN LA API LA FUNCION PARA EL CIERRE DE SESION
-
-
-                raise Exception("El usuario ha DETENIDO la conexion.")
+            confirmar = input('ALERTA! Cuenta de tipo REAL detectada. Capital en riesgo. ¿Deseas continuar? (y/n):').lower()
             
-        else:
-            print("Estas en un entorno de pruebas (DEMO).")
-            print('Base URL: ', self.client.API_URL)
+            if confirmar != 'y':
+                self._switch_to_testnet()   
+            else:
+                print("Entorno LIVE activado.") 
+        
+        print('Base URL: ', self.client.API_URL)
+        
+        # Verifica la información de la cuenta
+        self._get_account_info()
 
-        account_info = self.client.get_account()
 
-        if 'accountType' in account_info:
-            account_type = account_info['accountType']
-            print(f'El tipo de cuenta es: {account_type}')
+    def _switch_to_testnet(self):
+        """Cambia la conexión a testnet y limpia las credenciales."""
+        self._clear_credentials()
+        self.api_key = os.getenv('testnet_api_key')
+        self.secret_key = os.getenv('testnet_secret_key')
+        self.client = Client(self.api_key, self.secret_key, testnet=True)
+        self.client.API_URL = "https://testnet.binance.vision/api"
+        print("El usuario ha DETENIDO la conexion.\nEntorno de puebas (DEMO) activado.")      
+
+
+    def _get_account_info(self):
+        """Obtiene y muestra información de la cuenta."""
+
+        try:
+            account_info = self.client.get_account()
+            if 'accountType' in account_info:
+                account_type = account_info['accountType']
+                print(f'El tipo de cuenta es: {account_type}')
+        except BinanceAPIException as e:
+            print(f'Error al obtener información de la cuenta: {e}')
+
+
+    def _clear_credentials(self):
+        """Limpia las credenciales de la memoria."""
+        self.api_key = None
+        self.secret_key = None
