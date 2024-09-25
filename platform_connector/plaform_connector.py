@@ -16,6 +16,9 @@ class PlatformConnector():
 
         # Comprueba el tipo de cuenta 
         self._live_account_warning()
+
+        # Comprobación del trading algoritmico
+        self._check_algo_trading_enable()
     
 
     def _initialize_platform(self):
@@ -98,3 +101,13 @@ class PlatformConnector():
         """Limpia las credenciales de la memoria."""
         self.api_key = None
         self.secret_key = None
+
+
+    def _check_algo_trading_enable(self) -> None:
+        # Comprueba que el trading algoritmico está activado.
+        trading_status = (self.client.get_account_api_trading_status())
+
+        if 'data' in trading_status and not trading_status['data']['isLocked']:
+            raise Exception("El trading algorítmico está desactivado. Por favor actívalo MANUALMENTE!")
+        else:
+            print('El trading algoritmico esta habilitado.')
