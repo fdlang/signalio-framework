@@ -19,6 +19,8 @@ class PlatformConnector():
 
         # Comprobación del trading algoritmico
         self._check_algo_trading_enable()
+
+        # self._add_symbols_to_marketwatch()
     
 
     def _initialize_platform(self):
@@ -99,15 +101,39 @@ class PlatformConnector():
 
     def _clear_credentials(self):
         """Limpia las credenciales de la memoria."""
+        
         self.api_key = None
         self.secret_key = None
 
 
     def _check_algo_trading_enable(self) -> None:
+        
         # Comprueba que el trading algoritmico está activado.
-        trading_status = (self.client.get_account_api_trading_status())
+        if self.client.API_URL == 'https://api.binance.com/api':
+            trading_status = self.client.get_account_api_trading_status()
 
-        if 'data' in trading_status and not trading_status['data']['isLocked']:
-            raise Exception("El trading algorítmico está desactivado. Por favor actívalo MANUALMENTE!")
+            if not trading_status['data']['isLocked']:
+                raise Exception("El trading algorítmico está desactivado. Por favor actívalo MANUALMENTE!")
+            else:
+                print('El trading algoritmico esta habilitado.')
         else:
-            print('El trading algoritmico esta habilitado.')
+            self._add_symbols_to_marketwatch(self.client.get_exchange_info())
+
+
+    def _add_symbols_to_marketwatch(self, symbols:list) -> None:
+        """
+        """
+
+        assets = set() # crea un conjunto vacio para evitar duplicados
+
+        for symbols_info in symbols['symbols']:
+            if symbols_info['status'] == 'TRADING':
+                assets.add(symbols_info['symbol'])
+            else:
+                print(f"No se ha podido añadir el simbolo {symbols_info['symbol']} al MarketWatch: {symbols_info['status']}")
+        
+        print(sorted(assets))
+
+
+            
+        
