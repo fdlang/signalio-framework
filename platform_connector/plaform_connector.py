@@ -21,7 +21,7 @@ class PlatformConnector():
 		self._check_algo_trading_enable()
 
 		# Verificación de existencia de símbolos en el MarketWatch
-		self._add_symbols_to_marketwatch(symbols)
+		self._symbols_to_marketwatch(symbols)
 	
 
 	def _initialize_platform(self):
@@ -73,9 +73,6 @@ class PlatformConnector():
 				print("Entorno LIVE activado.") 
 		
 		print('Base URL: ', self.client.API_URL)
-		
-		# Verifica la información de la cuenta
-		self._get_account_info()
 
 
 	def _switch_to_testnet(self):
@@ -88,7 +85,7 @@ class PlatformConnector():
 		print("El usuario ha DETENIDO la conexion.\nEntorno de puebas (DEMO) activado.")      
 
 
-	def _get_account_info(self):
+	def _print_account_info(self):
 		"""Obtiene y muestra información de la cuenta."""
 
 		try:
@@ -119,7 +116,7 @@ class PlatformConnector():
 				print('El trading algoritmico esta habilitado.')
 
 
-	def _add_symbols_to_marketwatch(self, symbols: list) -> None:
+	def _symbols_to_marketwatch(self, symbols: list) -> None:
 		"""
 		Verifica si los símbolos en la lista están en el estado 'TRADING' dentro de exchange_info.
 		Si el símbolo no está en estado 'TRADING', imprime un mensaje indicándolo.
