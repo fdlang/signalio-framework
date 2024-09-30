@@ -17,12 +17,15 @@ class PlatformConnector():
 		# Comprueba el tipo de cuenta 
 		self._live_account_warning()
 
+		# Imprime información de la cuenta
+		self._print_account_info()
+
 		# Comprobación del trading algoritmico
 		self._check_algo_trading_enable()
 
 		# Verificación de existencia de símbolos en el MarketWatch
 		self._symbols_to_marketwatch(symbols)
-	
+
 
 	def _initialize_platform(self):
 		""" 
@@ -69,6 +72,7 @@ class PlatformConnector():
 			
 			if confirmar != 'y':
 				self._switch_to_testnet()   
+				print("El usuario ha DETENIDO la conexion.\nEntorno de puebas (DEMO) activado.")  
 			else:
 				print("Entorno LIVE activado.") 
 		
@@ -81,20 +85,7 @@ class PlatformConnector():
 		self.api_key = os.getenv('testnet_api_key')
 		self.secret_key = os.getenv('testnet_secret_key')
 		self.client = Client(self.api_key, self.secret_key, testnet=True)
-		self.client.API_URL = "https://testnet.binance.vision/api"
-		print("El usuario ha DETENIDO la conexion.\nEntorno de puebas (DEMO) activado.")      
-
-
-	def _print_account_info(self):
-		"""Obtiene y muestra información de la cuenta."""
-
-		try:
-			account_info = self.client.get_account()
-			if 'accountType' in account_info:
-				account_type = account_info['accountType']
-				print(f'El tipo de cuenta es: {account_type}')
-		except BinanceAPIException as e:
-			print(f'Error al obtener información de la cuenta: {e}')
+		self.client.API_URL = "https://testnet.binance.vision/api"    
 
 
 	def _clear_credentials(self):
@@ -137,6 +128,42 @@ class PlatformConnector():
 			if not found:
 				print(f"El símbolo {symbol} no existe en el MarketWatch.")
 
+
+	def _account_balance(self, balance:dict):
+
+		bal_info = set()
+
+		for bal in balance['balances']:
+				asset = str(bal['asset'])
+				free = float(bal['free'])
+				locked = float(bal['locked'])
+
+				if free > 0 or locked > 0:
+					bal_info.add((asset, free, locked))
+
+		return bal_info
+
+
+	def _print_account_info(self):
+		"""Obtiene y muestra información de la cuenta."""
+
+		try:
+			account_info = self.client.get_account()
+			
+			print(f'Comisión Maker: {account_info["makerCommission"]}')
+			print(f'Comisión Taker: {account_info["takerCommission"]}')
+			print(f'Puede operar: {account_info["canTrade"]}')
+			print(f'Puede retirar: {account_info["canWithdraw"]}')
+			print(f'Puede depositar: {account_info["canDeposit"]}')
+			print(f'Tipo de cuenta: {account_info["accountType"]}')
+			print(f'ID de usuario: {account_info["uid"]}')
+			
+			for bal in self._account_balance(account_info):
+				print(f'Activo: {bal[0]}, Disponible: {bal[1]}, Bloqueado: {bal[2]}')
+
+		except BinanceAPIException as e: 
+			print(f'Error al obtener información de la cuenta: {e}')
+	
 	
 
 	   
