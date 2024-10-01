@@ -6,11 +6,6 @@ from dotenv import load_dotenv, find_dotenv
 class PlatformConnector():
 	def __init__(self, symbols:list):
 
-		# busca el archivo .env y carga sus valores
-		load_dotenv(find_dotenv())
-		self.api_key = os.getenv('api_key')
-		self.secret_key = os.getenv('secret_key')
-
 		# Inicialización de la plataforma
 		self.client = self._initialize_platform()
 
@@ -35,7 +30,12 @@ class PlatformConnector():
 		Returns: Cliente de Binance 
 		"""
 
-		client = Client(self.api_key, self.secret_key)
+		# busca el archivo .env y carga sus valores
+		load_dotenv(find_dotenv())
+		api_key = os.getenv('api_key')
+		secret_key = os.getenv('secret_key')
+
+		client = Client(api_key, secret_key)
 
 		try:
 			client_status = client.get_account_status()
@@ -150,13 +150,16 @@ class PlatformConnector():
 		try:
 			account_info = self.client.get_account()
 			
-			print(f'Comisión Maker: {account_info["makerCommission"]}')
-			print(f'Comisión Taker: {account_info["takerCommission"]}')
-			print(f'Puede operar: {account_info["canTrade"]}')
-			print(f'Puede retirar: {account_info["canWithdraw"]}')
-			print(f'Puede depositar: {account_info["canDeposit"]}')
-			print(f'Tipo de cuenta: {account_info["accountType"]}')
-			print(f'ID de usuario: {account_info["uid"]}')
+			print(f'\n+---------- INFORMACIÓN DE LA CUENTA ----------\n')
+			print(f"| - Comisión Maker: {account_info['makerCommission']}")
+			print(f"| - Comisión Taker: {account_info['takerCommission']}")
+			print(f"| - Puede operar: {account_info['canTrade']}")
+			print(f"| - Puede retirar: {account_info['canWithdraw']}")
+			print(f"| - Puede depositar: {account_info['canDeposit']}")
+			print(f"| - Tipo de cuenta: {account_info['accountType']}")
+			print(f"| - ID de usuario: {account_info['uid']}")
+			print(f'\n+----------------------------------------------\n')
+
 			
 			for bal in self._account_balance(account_info):
 				print(f'Activo: {bal[0]}, Disponible: {bal[1]}, Bloqueado: {bal[2]}')
