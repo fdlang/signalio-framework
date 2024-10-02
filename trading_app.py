@@ -6,7 +6,7 @@ if __name__ == "__main__":
     symbols = ['ADAUSDT','ETHBTC','ETHHBTC']
 
     CONNECT = PlatformConnector(symbols)
-    #DATA = DataProvider(CONNECT.client)
+    
 
    
    
