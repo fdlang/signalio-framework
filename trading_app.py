@@ -8,3 +8,4 @@ if __name__ == "__main__":
     CONNECT = PlatformConnector(symbols)
     DATA = DataProvider(CONNECT.client)
 
+    print(DATA.get_latest_closed_bar("SOLUSDT", ""))
