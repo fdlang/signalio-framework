@@ -1,11 +1,21 @@
 import pandas as pd
 from binance.exceptions import BinanceAPIException, BinanceRequestException
+from typing import Dict
+from datetime import datetime
+from events.events import DataEvent
+from queue import Queue
 
 
 class DataProvider():
 
-    def __init__(self, client):
+    def __init__(self, client, events_queue:Queue, symbol_list:list, tiemframe:str):
         self.client = client
+        self.events_queue: events_queue # recibe una cola de eventos
+        self.symbols:list = symbol_list
+        self.tiemframe:str = tiemframe
+
+        # Diccionario para guardar el datetime de la última vela de cada símbolo
+        self.last_bar_datetime:Dict[str, datetime] = {symbol:datetime.min for symbol in self.symbols} 
 
 
     def _map_timeframes(self,timeframe:str) -> str:
@@ -139,3 +149,29 @@ class DataProvider():
         
         else:
             return tick
+
+
+    def check_for_new_data(self) -> None:
+
+        # Compruba si hay datos nuevos
+        for symbol in self.symbols:
+            last_bar = self.get_latest_closed_bar(symbol, self.tiemframe)
+
+            if last_bar is None:
+                continue
+            
+            # si hay datos nuevos
+            if not last_bar.empty and last_bar.name > self.last_bar_datetime[symbol]:
+                # Actualiza la última vela recuperada
+                self.last_bar_datetime[symbol] = last_bar.name
+
+                # crera DataEvent y se añade a la cola de eventos
+                data_event = DataEvent(symbol=symbol, data=last_bar)
+
+                # se añade a la cola de eventos
+                self.events_queue.put(data_event)
+
+
+
+
+
