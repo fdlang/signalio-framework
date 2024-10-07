@@ -1,5 +1,5 @@
 from enum import Enum
-from pydantic import BasaModel
+from pydantic import BaseModel
 import pandas as pd
 
 # Define los distintios tipos de eventos
@@ -9,8 +9,11 @@ class EventType(str, Enum): # hereda de str y Enum
     SIGNAL = "SIGNAL"
 
 
-class BaseEvent(BasaModel): # hereda de BaseModel
+class BaseEvent(BaseModel): # hereda de BaseModel
     event_type:EventType
+
+    class Config:
+        arbitrary_types_allowed = True
 
 
 class DataEvent(BaseEvent): # hereda de BaseEvent

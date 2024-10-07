@@ -8,17 +8,17 @@ from queue import Queue
 
 class DataProvider():
 
-    def __init__(self, client, events_queue:Queue, symbol_list:list, tiemframe:str):
+    def __init__(self, client, events_queue: Queue, symbol_list: list, timeframe: str):
         self.client = client
-        self.events_queue: events_queue # recibe una cola de eventos
-        self.symbols:list = symbol_list
-        self.tiemframe:str = tiemframe
+        self.events_queue = events_queue  # recibe una cola de eventos
+        self.symbols: list = symbol_list
+        self.timeframe: str = timeframe
 
         # Diccionario para guardar el datetime de la última vela de cada símbolo
         self.last_bar_datetime:Dict[str, datetime] = {symbol:datetime.min for symbol in self.symbols} 
 
 
-    def _map_timeframes(self,timeframe:str) -> str:
+    def _map_timeframes(self,timeframe: str) -> int:
 
         # crea un diccionario para temporalidades
         timeframe_mapping = {
@@ -44,7 +44,7 @@ class DataProvider():
             print(f"TimeFrame {timeframe} no valido!")
 
 
-    def get_latest_closed_bar(self, symbol:str, timeframe:str) -> pd.Series:
+    def get_latest_closed_bar(self, symbol: str, timeframe: str) -> pd.Series:
 
         # Define los paramertros adecuados
         interval = self._map_timeframes(timeframe) # intervalo de tiempo para las velas 
@@ -90,7 +90,7 @@ class DataProvider():
             return bars_np_array.iloc[-1]
 
 
-    def get_latest_closed_bars(self, symbol:str, timeframe:str, num_bars:int = 1) -> pd.DataFrame:
+    def get_latest_closed_bars(self, symbol: str, timeframe: str, num_bars: int = 1) -> pd.DataFrame:
 
         # Define los paramertros adecuados
         interval = timeframe # intervalo de tiempo para las velas 
@@ -132,7 +132,7 @@ class DataProvider():
             return barss
 
 
-    def get_latest_tick(self, symbol:str) -> dict:
+    def get_latest_tick(self, symbol: str) -> dict:
 
         try:
             tick = self.client.get_recent_trades(symbol=symbol,limit=1)
@@ -155,7 +155,7 @@ class DataProvider():
 
         # Compruba si hay datos nuevos
         for symbol in self.symbols:
-            last_bar = self.get_latest_closed_bar(symbol, self.tiemframe)
+            last_bar = self.get_latest_closed_bar(symbol, self.timeframe)
 
             if last_bar is None:
                 continue
@@ -171,7 +171,4 @@ class DataProvider():
                 # se añade a la cola de eventos
                 self.events_queue.put(data_event)
 
-
-
-
-
+    
