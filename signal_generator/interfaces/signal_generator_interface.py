@@ -7,3 +7,5 @@ class ISignalGererator(Protocol):
     def generate_signal(self, data_event:DataEvent) -> None:
         ...
 
+
+    
