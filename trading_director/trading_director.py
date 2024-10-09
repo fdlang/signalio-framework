@@ -1,5 +1,6 @@
 from data_provider.data_provider import DataProvider
-from events.events import DataEvent
+from signal_generator.interfaces.signal_generator_interface import ISignalGererator
+from events.events import DataEvent, SignalEvent
 from typing import Dict, Callable
 from datetime import datetime
 import queue, time
@@ -8,19 +9,21 @@ import queue, time
 
 class TradingDirector():
 
-    def __init__(self, events_queue: queue.Queue, data: DataProvider):
+    def __init__(self, events_queue: queue.Queue, data: DataProvider, signal_generator: ISignalGererator):
 
         self.events_queue = events_queue
 
         # referencia de los distintos módulos
         self.DATA = data
+        self.SIGNAL_GENERATOR = signal_generator
 
         # controlador de trading
         self.continue_trading: bool = True
 
         # crea el evento handler
         self.event_handler:Dict[str, Callable] = {
-            "DATA":self._handle_data_event, 
+            "DATA": self._handle_data_event, 
+            "SIGNAL": self._handle_signal_event,
         }
 
 
@@ -28,9 +31,16 @@ class TradingDirector():
         return datetime.now().strftime("%d/%m/%Y %H:%M:%S.%f") # format: 12/10/2024 20:30:234
 
 
+    def _handle_signal_event(self, event= SignalEvent):
+        # Procesa el signal event
+        print(f"{self._dateprint} - Recibido SIGNAL EVENT de {event.signal} para {event.symbol}")
+
+
     def _handle_data_event(self, event:DataEvent):
         # Gestiona los eventos de tipo DataEvent
-        print(f"{event.data.name} - Recibidos nuevos datos de {event.symbol} - Último precio de cierre {event.data.Close}")
+        print(f"{self._dateprint} - Recibido DATA EVENT de {event.symbol} - Último precio de cierre {event.data.Close}")
+        self.SIGNAL_GENERATOR.generate_signal(event)
+
 
     def execute(self) -> None:
 
@@ -48,6 +58,6 @@ class TradingDirector():
                     self.continue_trading = False
                     print(f"ERROR: Recibido evento nulo. Terminando ejecución del Framework")
             
-            time.sleep(1)
+            time.sleep(0.01)
         
         print("FIN")
