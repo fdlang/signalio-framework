@@ -7,11 +7,13 @@ import pandas as pd
 class EventType(str, Enum): # hereda de str y Enum
     DATA = "DATA"
     SIGNAL = "SIGNAL"
+    SIZING = "SIZING"
 
 
 class SignalType(str, Enum): 
     BUY = "BUY"
     SELL = "SELL"
+    
 
 
 class OrderType(str, Enum):
@@ -42,5 +44,17 @@ class SignalEvent(BaseEvent):
     order_id: int
     sl: float # stop loss
     tp: float # tipe profit
+
+
+class SizingEvent(BaseEvent):
+    event_type = EventType.SIZING
+    symbol: str
+    signal: SignalType
+    target_order: OrderType
+    target_price: float
+    order_id: int
+    sl: float # stop loss
+    tp: float # tipe profit
+    volume: float
 
 

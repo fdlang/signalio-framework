@@ -43,7 +43,6 @@ class SignalMACrossover(ISignalGererator):
 		# Recupera datos para calcular las medias móviles
 		bars = self.DATA.get_latest_closed_bars(symbol=symbol, timeframe=self.timeframe, num_bars=self.slow_period)
 		
-		
 		if bars is not None and 'Close' in bars.columns and not bars.empty:
 			bars['Close'] = pd.to_numeric(bars['Close'])
 

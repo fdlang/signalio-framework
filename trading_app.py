@@ -8,7 +8,7 @@ from queue import Queue
 if __name__ == "__main__":
 
     symbols = ['ADABTC','ETHBTC']
-    timeframe = "1m"
+    timeframe = "4h"
     slow_ma_perid = 50
     fast_ma_perid = 14
 
