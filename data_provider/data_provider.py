@@ -22,11 +22,11 @@ class DataProvider():
 
         # crea un diccionario para temporalidades
         timeframe_mapping = {
-            '1min':self.client.KLINE_INTERVAL_1MINUTE,
-            '3min':self.client.KLINE_INTERVAL_3MINUTE,
-            '5min':self.client.KLINE_INTERVAL_5MINUTE,
-            '15min':self.client.KLINE_INTERVAL_15MINUTE,
-            '30min':self.client.KLINE_INTERVAL_30MINUTE,
+            '1m':self.client.KLINE_INTERVAL_1MINUTE,
+            '3m':self.client.KLINE_INTERVAL_3MINUTE,
+            '5m':self.client.KLINE_INTERVAL_5MINUTE,
+            '15m':self.client.KLINE_INTERVAL_15MINUTE,
+            '30m':self.client.KLINE_INTERVAL_30MINUTE,
             '1h':self.client.KLINE_INTERVAL_1HOUR,
             '2h':self.client.KLINE_INTERVAL_2HOUR,
             '4h':self.client.KLINE_INTERVAL_4HOUR,
@@ -102,6 +102,8 @@ class DataProvider():
 
             if klines is None:
                 print(f"El símbolo {klines} no existe o no se ha podido recuperar sus datos")
+                return pd.DataFrame()
+
             else:
                 # Crea la cabecera del DataFrame
                 barss = pd.DataFrame(klines, columns=[
@@ -123,7 +125,7 @@ class DataProvider():
                 }, inplace=True) 
 
         except BinanceAPIException as e:
-            print(f"El símbolo {symbol} no existe o no se ha podido recuperar sus datos.")
+            print(f"No se han podido recuperar los datos de la última vela de {symbol} {timeframe}. ERROR: {e} ")
         except AttributeError as e:
             print(f"El intervalo de tiempo {interval} no es valido.")
         
@@ -142,6 +144,7 @@ class DataProvider():
 
         except BinanceAPIException as e:
             print(f"No se ha podido recuperar el ultimo tick, el símbolo {symbol} no es correcto")
+
         except BinanceRequestException as e:
             print(f"Algo no ha salido bien a la hora de recuperar el último tick. Binance Error: {e}")
         except Exception as e:

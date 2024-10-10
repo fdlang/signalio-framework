@@ -6,7 +6,6 @@ from datetime import datetime
 import queue, time
 
 
-
 class TradingDirector():
 
     def __init__(self, events_queue: queue.Queue, data: DataProvider, signal_generator: ISignalGererator):
@@ -33,12 +32,12 @@ class TradingDirector():
 
     def _handle_signal_event(self, event= SignalEvent):
         # Procesa el signal event
-        print(f"{self._dateprint} - Recibido SIGNAL EVENT de {event.signal} para {event.symbol}")
+        print(f"{self._dateprint()} - Recibido SIGNAL EVENT de {event.signal} para {event.symbol}")
 
 
     def _handle_data_event(self, event:DataEvent):
         # Gestiona los eventos de tipo DataEvent
-        print(f"{self._dateprint} - Recibido DATA EVENT de {event.symbol} - Último precio de cierre {event.data.Close}")
+        print(f"{self._dateprint()} - Recibido DATA EVENT de {event.symbol} - Último precio de cierre {event.data.Close}")
         self.SIGNAL_GENERATOR.generate_signal(event)
 
 

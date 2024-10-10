@@ -5,16 +5,16 @@ from queue import Queue
 import pandas as pd
 
 
-class SiganlMACrossover(ISignalGererator):
+class SignalMACrossover(ISignalGererator):
 	
 	
-	def __init__(self, event_queue: Queue, data: DataProvider, timeframe: str, fast_period: int, slow_perid: int):
+	def __init__(self, event_queue: Queue, data: DataProvider, timeframe: str, fast_period: int, slow_period: int):
 
 		self.event_queue = event_queue
 		self.DATA = data
 		self.timeframe = timeframe
 		self.fast_period = fast_period if fast_period > 1 else 2
-		self.slow_period = slow_perid if slow_perid > 2 else 3
+		self.slow_period = slow_period if slow_period > 2 else 3
 
 		if self.fast_period >= self.slow_period:
 			raise Exception(f"ERROR: el periodo rápido ({self.fast_period}) es mayor al periodo lento ({self.slow_period}) para el cálculo de las medias móviles")
@@ -41,30 +41,34 @@ class SiganlMACrossover(ISignalGererator):
 		symbol = data_event.symbol
 
 		# Recupera datos para calcular las medias móviles
-		bars = self.DATA.get_latest_closed_bars(symbol, self.timeframe, self.slow_period)
-
-		# Calcula el valor de los indicadores
-		fast_ma = bars['Close'][-self.fast_period:].mean()
-		slow_ma = bars['Close'].mean()
-
-		# Detecta una señal de compra
-		if fast_ma > slow_ma:
-			signal = "BUY"
-
-		# señal de venta
-		elif slow_ma > fast_ma: 
-			signal = "SELL"
-		else:
-			signal = ""
+		bars = self.DATA.get_latest_closed_bars(symbol=symbol, timeframe=self.timeframe, num_bars=self.slow_period)
 		
-		if signal != "":
-			self._create_and_put_signal_event(
-				symbol=symbol,
-				signal=signal,
-				target_order="MARKET",
-				target_price=0.0,
-				order_id=1234,
-				sl=0.0,
-				tp=0.0
-			)
+		
+		if bars is not None and 'Close' in bars.columns and not bars.empty:
+			bars['Close'] = pd.to_numeric(bars['Close'])
+
+			# Calcula el valor de los indicadores
+			fast_ma = bars['Close'][-self.fast_period:].mean()
+			slow_ma = bars['Close'].mean()
+
+			# Detecta una señal de compra
+			if fast_ma > slow_ma:
+				signal = "BUY"
+
+			# señal de venta
+			elif slow_ma > fast_ma: 
+				signal = "SELL"
+			else:
+				signal = ""
+			
+			if signal != "":
+				self._create_and_put_signal_event(
+					symbol=symbol,
+					signal=signal,
+					target_order="MARKET",
+					target_price=0.0,
+					order_id=1234,
+					sl=0.0,
+					tp=0.0
+				)
 
