@@ -137,7 +137,7 @@ class DataProvider():
     def get_latest_tick(self, symbol: str) -> dict:
 
         try:
-            tick = self.client.get_ticker(symbol=symbol)
+            tick = self.client.get_recent_trades(symbol=symbol, limit=1)
 
             if tick is None:
                 print(f"No se ha podido recuperar el últinmo tick de {symbol}")
@@ -155,6 +155,19 @@ class DataProvider():
         
         else:
             return tick
+    
+
+    def get_bid_ask(self, symbol: str) -> dict:
+
+        try:
+            order_book = self.client.get_order_book(symbol=symbol)
+            bid = order_book['bids'][0][0] if order_book['bids'] else None
+            ask = order_book['asks'][0][0] if order_book['asks'] else None
+
+            return {"bid": bid, "ask": ask}
+        except Exception as e:
+            print(f"Error al obtener bid y ask: {e}")
+            return None
 
 
     def check_for_new_data(self) -> None:
