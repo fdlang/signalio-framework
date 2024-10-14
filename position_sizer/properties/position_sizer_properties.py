@@ -7,3 +7,7 @@ class MinSizingProps(BaseModel):
 
 class FixedSizingProps(BaseModel):
     volume: float
+
+
+class RiskPctSizingProps(BaseModel):
+    risk_pct: float
