@@ -1,6 +1,7 @@
 from binance.client import Client
 from data_provider.data_provider import DataProvider
 from events.events import SignalEvent
+from utils.utils import Utils
 from ..interfaces.position_sizer_interface import IPositionSizer
 from ..properties.position_sizer_properties import RiskPctSizingProps
 
@@ -64,13 +65,18 @@ class RiskPctPositionSizer(IPositionSizer):
 		tick_value_profit_ccy = asset_unid * tick_size			# Cántidad ganada o perdida por cada tick
 
 		# Conviertick el tick value en profit ccy del symbolo a la divisa de la cuenta
-		tick_value_account_ccy = 5
+		tick_value_account_ccy = Utils.convert_currency_amount_to_another_currency(tick_value_profit_ccy, symbol_profit_ccy, account_ccy)
 
 	    # Cálculo del tamaño de la posición
-		price_distance_in_integer_ticksizes = int(abs(entry_price - signal_event.sl) / tick_size)
-		monetary_risk = equity * self.risk_pct	
-		volume = monetary_risk / (price_distance_in_integer_ticksizes * tick_value_account_ccy)
-		volume = round(volume / volume_step) * volume_step
+		try:
+			price_distance_in_integer_ticksizes = int(abs(entry_price - signal_event.sl) / tick_size)
+			monetary_risk = equity * self.risk_pct	
+			volume = monetary_risk / (price_distance_in_integer_ticksizes * tick_value_account_ccy)
+			volume = round(volume / volume_step) * volume_step
+		except Exception as e:
+			print(f"ERROR: Problema al calcular el tamaño de la posición en función del riesgo. Excepción: {e}")
+			return 0.0
 
-		return volume
+		else:
+			return volume
 		

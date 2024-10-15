@@ -44,7 +44,7 @@ class Utils():
             last_price = float(tick['bidPrice'])
 
             # Convierte la cantidad de la divisa origen a la divisa destino
-            convert_amount = amount / last_price if fx_symbol_base == to_ccy else amount = last_price
+            convert_amount = amount / last_price if fx_symbol_base == to_ccy else last_price
             return convert_amount
     
 

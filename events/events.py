@@ -23,7 +23,7 @@ class OrderType(str, Enum):
 
 
 class BaseEvent(BaseModel): 
-    event_type:EventType
+    event_type: EventType
 
     class Config:
         arbitrary_types_allowed = True
@@ -47,7 +47,7 @@ class SignalEvent(BaseEvent):
 
 
 class SizingEvent(BaseEvent):
-    event_type = EventType.SIZING
+    event_type: EventType = EventType.SIZING
     symbol: str
     signal: SignalType
     target_order: OrderType
