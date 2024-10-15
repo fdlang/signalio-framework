@@ -6,6 +6,7 @@ from dotenv import load_dotenv, find_dotenv
 class PlatformConnector():
 	def __init__(self, symbols:list):
 
+		
 		# Inicialización de la plataforma
 		self.client = self._initialize_platform()
 
@@ -20,7 +21,7 @@ class PlatformConnector():
 
 		# Verificación de existencia de símbolos en el MarketWatch
 		self._symbols_to_marketwatch(symbols)
-
+ 
 
 	def _initialize_platform(self):
 		""" 
@@ -46,7 +47,11 @@ class PlatformConnector():
 		
 		except BinanceAPIException as e:
 			print(f'Error de la API de Binance: {e}')
+
+			if e.code == 1021:
+				print(f"Hay un problema de sincronización de tiempo entre tu máquina local y los servidores de Binance. Sincroniza el reloj de tu maquina.")
 			return None
+		
 		except BinanceRequestException as e:
 			print(f'Error de conexión: {e}')
 			return None
@@ -66,17 +71,18 @@ class PlatformConnector():
 		if self.client is None:
 			print("Error: Cliente de Binance no inicializado correctamente.")
 			return
-
-		if "https://api.binance.com/api" in self.client.API_URL:
-			confirmar = input('ALERTA! Cuenta de tipo REAL detectada. Capital en riesgo. ¿Deseas continuar? (y/n):').lower()
-			
-			if confirmar != 'y':
-				self._switch_to_testnet()   
-				print("El usuario ha DETENIDO la conexion.\nEntorno de puebas (DEMO) activado.")  
-			else:
-				print("Entorno LIVE activado.") 
 		
-		print('Base URL: ', self.client.API_URL)
+		else:
+			if "https://api.binance.com/api" in self.client.API_URL:
+				confirmar = input('ALERTA! Cuenta de tipo REAL detectada. Capital en riesgo. ¿Deseas continuar? (y/n):').lower()
+				
+				if confirmar != 'y':
+					self._switch_to_testnet()   
+					print("El usuario ha DETENIDO la conexion.\nEntorno de puebas (DEMO) activado.")  
+				else:
+					print("Entorno LIVE activado.") 
+			
+				print('Base URL: ', self.client.API_URL)
 
 
 	def _switch_to_testnet(self):
@@ -149,7 +155,7 @@ class PlatformConnector():
 
 		try:
 			account_info = self.client.get_account()
-			
+				
 			print(f'\n+---------- INFORMACIÓN DE LA CUENTA ----------\n')
 			print(f"| - Comisión Maker: {account_info['makerCommission']}")
 			print(f"| - Comisión Taker: {account_info['takerCommission']}")
@@ -160,10 +166,10 @@ class PlatformConnector():
 			print(f"| - ID de usuario: {account_info['uid']}")
 			print(f'\n+----------------------------------------------\n')
 
-			
+				
 			for bal in self._account_balance(account_info):
 				print(f'Activo: {bal[0]}, Disponible: {bal[1]}, Bloqueado: {bal[2]}')
-
+					
 		except BinanceAPIException as e: 
 			print(f'Error al obtener información de la cuenta: {e}')
 	

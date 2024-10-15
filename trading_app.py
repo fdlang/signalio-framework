@@ -9,32 +9,37 @@ from queue import Queue
 
 if __name__ == "__main__":
 
-    symbols = ['ADABTC','ETHBTC', 'SOLUSDT']
-    timeframe = "1m"
-    slow_ma_perid = 50
-    fast_ma_perid = 14
+    try:
+        symbols = ['ADABTC','ETHBTC', 'SOLUSDT']
+        timeframe = "1m"
+        slow_ma_perid = 50
+        fast_ma_perid = 14
 
-    # creación de la cola de eventos principal
-    events_queue = Queue()
+        # creación de la cola de eventos principal
+        events_queue = Queue()
 
-    # creación modulos principales del framework
-    CONNECT = PlatformConnector(symbols=symbols)
-    DATA = DataProvider(CONNECT.client, 
-                        events_queue=events_queue, 
-                        symbol_list=symbols, 
-                        timeframe=timeframe)
-    SIGNAL_GENERATOR = SignalMACrossover(event_queue=events_queue, 
-                                        data=DATA, 
-                                        timeframe=timeframe, 
-                                        fast_period=fast_ma_perid, 
-                                        slow_period=slow_ma_perid)
-    POSITION_SIZER = PositionSizer(events_queu=events_queue,
-                                    data_provider=DATA, 
-                                    sizing_properties=FixedSizingProps(volume=0.09))
+        # creación modulos principales del framework
+        CONNECT = PlatformConnector(symbols=symbols)
+        DATA = DataProvider(CONNECT.client, 
+                            events_queue=events_queue, 
+                            symbol_list=symbols, 
+                            timeframe=timeframe)
+        SIGNAL_GENERATOR = SignalMACrossover(event_queue=events_queue, 
+                                            data=DATA, 
+                                            timeframe=timeframe, 
+                                            fast_period=fast_ma_perid, 
+                                            slow_period=slow_ma_perid)
+        POSITION_SIZER = PositionSizer(events_queu=events_queue,
+                                        data_provider=DATA, 
+                                        sizing_properties=FixedSizingProps(volume=0.09))
 
-    # Crea el trading director y ejecuta el metodo principal
-    TRADING_DIRECTOR = TradingDirector(events_queue=events_queue, data=DATA, signal_generator=SIGNAL_GENERATOR, position_sizer=POSITION_SIZER)
-    TRADING_DIRECTOR.execute()
+        # Crea el trading director y ejecuta el metodo principal
+        TRADING_DIRECTOR = TradingDirector(events_queue=events_queue, data=DATA, signal_generator=SIGNAL_GENERATOR, position_sizer=POSITION_SIZER)
+        TRADING_DIRECTOR.execute()
+
+    except KeyboardInterrupt:
+        print(f"\nEjecución interrumpida por el usuario.")
+        exit() 
 
 
    
