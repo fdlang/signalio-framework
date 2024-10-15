@@ -3,6 +3,7 @@ from binance.exceptions import BinanceAPIException, BinanceRequestException
 from typing import Dict
 from datetime import datetime
 from events.events import DataEvent
+from utils.utils import Utils
 from queue import Queue
 
 
@@ -189,20 +190,6 @@ class DataProvider():
 
                 # se añade a la cola de eventos
                 self.events_queue.put(data_event)
-    
-    def get_usdt_value(self, asset, amount):
-
-        if asset == 'USDT':  # Si la moneda es USDT, no hace falta convertir
-            return float(amount)
-        try:
-            # Obtiene el precio de la moneda en USDT
-            ticker = self.client.get_symbol_ticker(symbol=f"{asset}USDT")
-            price_in_usdt = float(ticker['price'])
-            return price_in_usdt * float(amount)
-        except Exception as e:
-            # Si no existe un par directo en USDT, se ignora
-            print(f"No se pudo obtener el precio de {asset} en USDT: {e}")
-            return 0
         
 
     def get_account_balance_usdt(self):
@@ -214,9 +201,9 @@ class DataProvider():
             free_balance = balance['free']
 
             if float(free_balance) > 0:
-                total_usdt_value += self.get_usdt_value(asset, free_balance)
+                total_usdt_value += Utils.get_usdt_value(asset, free_balance)
 
-        return total_usdt_value
+        return total_usdt_value 
 
 
                 
