@@ -10,7 +10,7 @@ from queue import Queue
 if __name__ == "__main__":
 
     symbols = ['ADABTC','ETHBTC', 'SOLUSDT']
-    timeframe = "4h"
+    timeframe = "1m"
     slow_ma_perid = 50
     fast_ma_perid = 14
 
@@ -30,7 +30,7 @@ if __name__ == "__main__":
                                         slow_period=slow_ma_perid)
     POSITION_SIZER = PositionSizer(events_queu=events_queue,
                                     data_provider=DATA, 
-                                    sizing_properties=RiskPctSizingProps(risk_pct=0.01))
+                                    sizing_properties=FixedSizingProps(volume=0.09))
 
     # Crea el trading director y ejecuta el metodo principal
     TRADING_DIRECTOR = TradingDirector(events_queue=events_queue, data=DATA, signal_generator=SIGNAL_GENERATOR, position_sizer=POSITION_SIZER)

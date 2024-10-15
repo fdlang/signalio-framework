@@ -67,7 +67,7 @@ class SignalMACrossover(ISignalGererator):
 					target_order="MARKET",
 					target_price=0.0,
 					order_id=1234,
-					sl=155.0,
-					tp=130.0
+					sl=0.0,
+					tp=0.0
 				)
 
