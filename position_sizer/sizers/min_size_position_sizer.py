@@ -7,7 +7,7 @@ class MinSizePositionSizer(IPositionSizer):
 
 	def size_signal(self, signal_event: SignalEvent, data_provider: DataProvider) -> float:
 		
-		symbol_info = data_provider.client.get_symbol_Info(signal_event.symbol)
+		symbol_info = data_provider.client.get_symbol_info(signal_event.symbol)
 		volume = symbol_info['filters'][1]['minQty']
 
 		if volume is not None:
