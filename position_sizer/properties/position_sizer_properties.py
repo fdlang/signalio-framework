@@ -1,6 +1,10 @@
 from pydantic import BaseModel
 
 
+class BaseSizerProps(BaseModel):
+    pass
+
+
 class MinSizingProps(BaseModel):
     pass
 
