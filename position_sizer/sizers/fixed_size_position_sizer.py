@@ -10,7 +10,7 @@ class FixedSizePositionSizer(IPositionSizer):
         self.fixed_volume = properties.volume
     
 
-    def size_position(self, signal_event: SignalEvent, data_provider: DataProvider) -> float:
+    def size_signal(self, signal_event: SignalEvent, data_provider: DataProvider) -> float:
 
         # Devuelve el tamaño de posición fija 
         if self.fixed_volume >= 0.0:

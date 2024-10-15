@@ -5,7 +5,7 @@ from ..interfaces.position_sizer_interface import IPositionSizer
 
 class MinSizePositionSizer(IPositionSizer):
 
-	def size_position(self, signal_event: SignalEvent, data_provider: DataProvider) -> float:
+	def size_signal(self, signal_event: SignalEvent, data_provider: DataProvider) -> float:
 		
 		symbol_info = data_provider.client.get_symbol_Info(signal_event.symbol)
 		volume = symbol_info['filters'][1]['minQty']
