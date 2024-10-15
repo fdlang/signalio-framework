@@ -57,7 +57,7 @@ class PositionSizer(IPositionSizer):
         volume = self.position_sizing_method.size_signal(signal_event, self.DATA_PROVIDER)
 
         # Control de seguridad
-        if volume < Client().get_symbol_info(signal_event.symbol)['filters'][1]['minQty']:
+        if volume < float(Client().get_symbol_info(signal_event.symbol)['filters'][1]['minQty']):
             print(f"ERROR: El volumen {volume} es menor al volumen mínimo admitido por el símbolo {signal_event.symbol}")
             return None
 

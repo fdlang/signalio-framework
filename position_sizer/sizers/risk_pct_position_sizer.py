@@ -12,7 +12,7 @@ class RiskPctPositionSizer(IPositionSizer):
 		self.risk_pct = properties.risk_pct
 
 
-	def size_signal(self, signal_event: SignalEvent, data_provider: DataProvider, asset_buy_unid: float	) -> float:
+	def size_signal(self, signal_event: SignalEvent, data_provider: DataProvider) -> float:
 		
 		# Resiva que el riesgo se positivo
 		if self.risk_pct <= 0.0:
@@ -59,13 +59,9 @@ class RiskPctPositionSizer(IPositionSizer):
 		tick_size = symbol_info['filters'][0]['tickSize'] 		# Cambio mínimo de precio 
 		account_ccy = "USDT"									# Divisa de la cuenta
 		symbol_profit_ccy = symbol_info['quoteAsset'] 			# Divisa del asset
-		asset_unid = asset_buy_unid								# Unidades de la divisa que se quiere comprar
-		
-		# Cálculos auxiliares
-		tick_value_profit_ccy = asset_unid * tick_size			# Cántidad ganada o perdida por cada tick
 
 		# Conviertick el tick value en profit ccy del symbolo a la divisa de la cuenta
-		tick_value_account_ccy = Utils.convert_currency_amount_to_another_currency(tick_value_profit_ccy, symbol_profit_ccy, account_ccy)
+		tick_value_account_ccy = Utils.convert_currency_amount_to_another_currency(tick_size, symbol_profit_ccy, account_ccy)
 
 	    # Cálculo del tamaño de la posición
 		try:
