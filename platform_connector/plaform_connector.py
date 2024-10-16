@@ -107,10 +107,10 @@ class PlatformConnector():
 		if self.client.API_URL == 'https://api.binance.com/api':
 			trading_status = self.client.get_account_api_trading_status()
 
-			if not trading_status['data']['isLocked']:
-				raise Exception("El trading algorítmico está desactivado. Por favor actívalo MANUALMENTE!")
+			if trading_status['data']['isLocked']:
+				raise Exception(f"El trading algorítmico está desactivado. Por favor actívalo MANUALMENTE!")
 			else:
-				print('El trading algoritmico esta habilitado.')
+				print(f"El trading algoritmico esta habilitado.")
 
 
 	def _symbols_to_marketwatch(self, symbols: list) -> None:

@@ -11,7 +11,7 @@ if __name__ == "__main__":
 
     try:
         symbols = ['ADABTC','ETHBTC', 'SOLUSDT']
-        timeframe = "1m"
+        timeframe = "4h"
         slow_ma_perid = 50
         fast_ma_perid = 14
 
