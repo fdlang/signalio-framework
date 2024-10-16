@@ -166,10 +166,11 @@ class PlatformConnector():
 			print(f"| - ID de usuario: {account_info['uid']}")
 			print(f'\n+----------------------------------------------\n')
 
-				
+			print(f"------------ Balance de la cuenta ------------\n")
 			for bal in self._account_balance(account_info):
-				print(f'Activo: {bal[0]}, Disponible: {bal[1]}, Bloqueado: {bal[2]}')
-					
+				print(f'| - Activo: {bal[0]}, Disponible: {bal[1]}, Bloqueado: {bal[2]}')
+
+			print("\n+----------------------------------------------\n")	
 		except BinanceAPIException as e: 
 			print(f'Error al obtener información de la cuenta: {e}')
 	
