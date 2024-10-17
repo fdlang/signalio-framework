@@ -4,6 +4,7 @@ from trading_director.trading_director import TradingDirector
 from signal_generator.signals.signal_ma_crossover import SignalMACrossover
 from position_sizer.position_sizer import PositionSizer
 from position_sizer.properties.position_sizer_properties import MinSizingProps, FixedSizingProps, RiskPctSizingProps
+from portfolio.portfolio import Portfolio
 from queue import Queue
 
 
@@ -12,6 +13,7 @@ if __name__ == "__main__":
     try:
         symbols = ['ADABTC','ETHBTC', 'SOLUSDT']
         timeframe = "4h"
+        order_id = 12345
         slow_ma_perid = 50
         fast_ma_perid = 14
 
@@ -24,11 +26,15 @@ if __name__ == "__main__":
                             events_queue=events_queue, 
                             symbol_list=symbols, 
                             timeframe=timeframe)
+        
+        PORTFOLIO = Portfolio(order_id= order_id, data_provider=DATA)
         SIGNAL_GENERATOR = SignalMACrossover(event_queue=events_queue, 
                                             data=DATA, 
+                                            portfolio=PORTFOLIO,
                                             timeframe=timeframe, 
                                             fast_period=fast_ma_perid, 
                                             slow_period=slow_ma_perid)
+        
         POSITION_SIZER = PositionSizer(events_queu=events_queue,
                                         data_provider=DATA, 
                                         sizing_properties=FixedSizingProps(volume=0.09))

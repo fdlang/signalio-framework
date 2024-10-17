@@ -28,7 +28,7 @@ class RiskPctPositionSizer(IPositionSizer):
 		symbol_info = Client().get_symbol_info(signal_event.symbol)
 
 		# Recupera el precio de entrada estimado:
-		# Si es una orden de mercasdo
+		# Si es una orden de mercado
 		if signal_event.target_order == "MARKET":
 
 			# obtiene el últimno precio disponible en el mercado (ask o bid)

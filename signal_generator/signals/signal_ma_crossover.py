@@ -1,6 +1,7 @@
 from ..interfaces.signal_generator_interface import ISignalGererator
 from data_provider.data_provider import DataProvider
 from events.events import DataEvent, SignalEvent
+from portfolio.portfolio import Portfolio
 from queue import Queue
 import pandas as pd
 
@@ -8,10 +9,11 @@ import pandas as pd
 class SignalMACrossover(ISignalGererator):
 	
 	
-	def __init__(self, event_queue: Queue, data: DataProvider, timeframe: str, fast_period: int, slow_period: int):
+	def __init__(self, event_queue: Queue, data: DataProvider, portfolio: Portfolio, timeframe: str, fast_period: int, slow_period: int):
 
 		self.event_queue = event_queue
 		self.DATA = data
+		self.PORTFOLIO = portfolio
 		self.timeframe = timeframe
 		self.fast_period = fast_period if fast_period > 1 else 2
 		self.slow_period = slow_period if slow_period > 2 else 3
@@ -43,6 +45,9 @@ class SignalMACrossover(ISignalGererator):
 		# Recupera datos para calcular las medias móviles
 		bars = self.DATA.get_latest_closed_bars(symbol=symbol, timeframe=self.timeframe, num_bars=self.slow_period)
 		
+		# Recupera las posiciones abiertas por esta estrategia en el simbolo donde se ha tenido el Data event
+		open_position = self.PORTFOLIO.get_number_of_strategy_open_position_by_symbol(symbol)
+
 		if bars is not None and 'Close' in bars.columns and not bars.empty:
 			bars['Close'] = pd.to_numeric(bars['Close'])
 
@@ -51,11 +56,11 @@ class SignalMACrossover(ISignalGererator):
 			slow_ma = bars['Close'].mean()
 
 			# Detecta una señal de compra
-			if fast_ma > slow_ma:
+			if open_position['LONG'] == 0 and fast_ma > slow_ma:
 				signal = "BUY"
 
 			# señal de venta
-			elif slow_ma > fast_ma: 
+			elif open_position['SHORT'] == 0 and slow_ma > fast_ma: 
 				signal = "SELL"
 			else:
 				signal = ""
@@ -66,7 +71,7 @@ class SignalMACrossover(ISignalGererator):
 					signal=signal,
 					target_order="MARKET",
 					target_price=0.0,
-					order_id=1234,
+					order_id=self.PORTFOLIO.order_id,
 					sl=0.0,
 					tp=0.0
 				)

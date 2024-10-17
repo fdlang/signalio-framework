@@ -49,7 +49,7 @@ class PlatformConnector():
 			print(f'Error de la API de Binance: {e}')
 
 			if e.code == 1021:
-				print(f"Hay un problema de sincronización de tiempo entre tu máquina local y los servidores de Binance. Sincroniza el reloj de tu maquina.")
+				print(f"Hay un problema de sincronización de tiempo entre tu máquina local y los servidores de Binance. Sincroniza el reloj de tu máquina.")
 			return None
 		
 		except BinanceRequestException as e:
