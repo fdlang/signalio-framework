@@ -17,7 +17,7 @@ class Portfolio():
         positions = []
         
         for position in self.data.client.get_open_orders():
-            if position.clientOrderId == self.order_id:
+            if position['clientOrderId'] == self.order_id:
                 positions.append(position)
         
         return tuple(positions)
@@ -28,8 +28,8 @@ class Portfolio():
         longs = 0
         shorts = 0
 
-        for position in tuple(self.data.client.get_open_orders(symbol= symbol)):
-            if position.type == self.data.client.SIDE_BUY:
+        for position in self.data.client.get_open_orders(symbol= symbol):
+            if position['type'] == self.data.client.SIDE_BUY:
                 longs += 1
             else:
                 shorts += 1
@@ -42,8 +42,8 @@ class Portfolio():
         longs = 0
         shorts = 0
 
-        for position in tuple(self.data.client.get_open_orders(symbol= symbol)):
-            if position.clientOrderId == self.order_id:
+        for position in self.data.client.get_open_orders(symbol= symbol):
+            if position['clientOrderId'] == self.order_id:
                 longs += 1
             else:
                 shorts += 1
