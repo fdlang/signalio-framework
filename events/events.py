@@ -8,12 +8,12 @@ class EventType(str, Enum): # hereda de str y Enum
     DATA = "DATA"
     SIGNAL = "SIGNAL"
     SIZING = "SIZING"
+    ORDER = "ORDER"
 
 
 class SignalType(str, Enum): 
     BUY = "BUY"
     SELL = "SELL"
-    
 
 
 class OrderType(str, Enum):
@@ -58,3 +58,13 @@ class SizingEvent(BaseEvent):
     volume: float
 
 
+class OrderEvent(BaseEvent):
+    event_type: EventType = EventType.ORDER
+    symbol: str
+    signal: SignalType
+    target_order: OrderType
+    target_price: float
+    order_id: int
+    sl: float # stop loss
+    tp: float # tipe profit
+    volume: float
