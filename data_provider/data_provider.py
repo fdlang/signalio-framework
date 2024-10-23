@@ -191,6 +191,7 @@ class DataProvider():
 				# se añade a la cola de eventos
 				self.events_queue.put(data_event)
 
+
 	def get_account_balance_usdt(self):
 		# Calcula el saldo total de la billetera en USDT
 		total_usdt_value = 0

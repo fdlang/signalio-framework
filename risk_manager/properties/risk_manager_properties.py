@@ -5,5 +5,5 @@ class BaseRiskProps(BaseModel):
     pass
 
 
-class MaxLeverageRiskProps(BaseRiskProps):
-    max_leverage: float
+class MaxLeverageFactorRiskProps(BaseRiskProps):
+    max_leverage_factor: float
