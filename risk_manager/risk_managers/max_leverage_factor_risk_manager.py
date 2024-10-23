@@ -38,7 +38,7 @@ class MaxLeverageFactorRiskManager(IRiskManager):
             return False
 
     
-    def asset_order(self, sizing_event: SizingEvent, current_position_value_acc_ccy: float, new_position_value_acc_ccy: float) -> float:
+    def assess_order(self, sizing_event: SizingEvent, current_position_value_acc_ccy: float, new_position_value_acc_ccy: float) -> float:
 
         # Método para hacer la función de discoteca (deja pasar la operación o no)
         if  self. _check_new_position_is_compliant_with_max_leverege_factor(sizing_event, current_position_value_acc_ccy, new_position_value_acc_ccy):
