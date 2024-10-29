@@ -30,10 +30,10 @@ class MaxLeverageFactorRiskManager(IRiskManager):
         new_leverage_factor = self._compute_leverege_factor(new_account_value)
 
         # Comprueba si el nuevo leverage factor sería mayor a nuestro máximo leverage factor
-        if new_leverage_factor < self.max_leverage_factor: 
+        if abs(new_leverage_factor) <= self.max_leverage_factor: 
             return True
         else:
-            print(f"RISK MANAGER: La posición {sizing_event.signal} {sizing_event.volume} implica un Leverage Factor de {new_leverage_factor},
+            print(f"RISK MANAGER: La posición {sizing_event.signal} {sizing_event.volume} implica un Leverage Factor de {abs(new_leverage_factor)},
                   que supera el máx. de {self.max_leverage_factor}")
             return False
 
