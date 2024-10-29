@@ -1,7 +1,8 @@
 from data_provider.data_provider import DataProvider
 from signal_generator.interfaces.signal_generator_interface import ISignalGererator
 from position_sizer.position_sizer import PositionSizer
-from events.events import DataEvent, SignalEvent, SizingEvent
+from risk_manager.risk_manager import RiskManager
+from events.events import DataEvent, SignalEvent, SizingEvent, OrderEvent
 from typing import Dict, Callable
 from datetime import datetime
 import queue, time
@@ -9,7 +10,7 @@ import queue, time
 
 class TradingDirector():
 
-    def __init__(self, events_queue: queue.Queue, data: DataProvider, signal_generator: ISignalGererator, position_sizer: PositionSizer):
+    def __init__(self, events_queue: queue.Queue, data: DataProvider, signal_generator: ISignalGererator, position_sizer: PositionSizer, risk_manager: RiskManager):
 
         self.events_queue = events_queue
 
@@ -17,6 +18,7 @@ class TradingDirector():
         self.DATA = data
         self.SIGNAL_GENERATOR = signal_generator
         self.POSITION_SIZER = position_sizer
+        self.RISK_MANAGER = risk_manager
 
         # controlador de trading
         self.continue_trading: bool = True
@@ -26,6 +28,7 @@ class TradingDirector():
             "DATA": self._handle_data_event, 
             "SIGNAL": self._handle_signal_event,
             "SIZING": self._handle_sizing_event,
+            "ORDER": self._handle_order_event,
         }
 
 
@@ -47,6 +50,11 @@ class TradingDirector():
 
     def _handle_sizing_event(self, event: SizingEvent):
         print(f"{self._dateprint()} - Recibido SIZING EVENT con volumen {event.volume}  para {event.signal} en {event.symbol}")
+        self.RISK_MANAGER.assess_order(event)
+
+    
+    def _handle_order_event(self, event: OrderEvent):
+        print(f"{self._dateprint()} - Recibido ORDER EVENT con volumen {event.volume}  para {event.signal} en {event.symbol}")
 
 
     def execute(self) -> None:
