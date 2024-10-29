@@ -5,13 +5,16 @@ from signal_generator.signals.signal_ma_crossover import SignalMACrossover
 from position_sizer.position_sizer import PositionSizer
 from position_sizer.properties.position_sizer_properties import MinSizingProps, FixedSizingProps, RiskPctSizingProps
 from portfolio.portfolio import Portfolio
+from risk_manager.risk_manager import RiskManager
+from risk_manager.properties.risk_manager_properties import MaxLeverageFactorRiskProps
+
 from queue import Queue
 
 
 if __name__ == "__main__":
 
     try:
-        symbols = ['ADABTC','ETHBTC', 'SOLUSDT']
+        symbols = ['ADABTC','ETHBTC', 'SOLUSDT', 'SOLBTC', 'SOLETH']
         timeframe = "4h"
         order_id = 12345
         slow_ma_perid = 50
@@ -22,25 +25,36 @@ if __name__ == "__main__":
 
         # creación modulos principales del framework
         CONNECT = PlatformConnector(symbols=symbols)
-        DATA = DataProvider(CONNECT.client, 
+        DATA_PROVIDER = DataProvider(CONNECT.client, 
                             events_queue=events_queue, 
                             symbol_list=symbols, 
                             timeframe=timeframe)
         
-        PORTFOLIO = Portfolio(order_id= order_id, data_provider=DATA)
+        PORTFOLIO = Portfolio(order_id= order_id, data_provider=DATA_PROVIDER)
         SIGNAL_GENERATOR = SignalMACrossover(event_queue=events_queue, 
-                                            data=DATA, 
+                                            data=DATA_PROVIDER, 
                                             portfolio=PORTFOLIO,
                                             timeframe=timeframe, 
                                             fast_period=fast_ma_perid, 
                                             slow_period=slow_ma_perid)
         
         POSITION_SIZER = PositionSizer(events_queu=events_queue,
-                                        data_provider=DATA, 
-                                        sizing_properties=FixedSizingProps(volume=0.09))
+                                        data_provider=DATA_PROVIDER, 
+                                        sizing_properties=FixedSizingProps(volume=0.09))    # 1% de riesgo
+        
+
+        RISK_MANAGER = RiskManager(events_queue=events_queue,
+                                   data_provider=DATA_PROVIDER,
+                                   portfolio=PORTFOLIO,
+                                   risk_properties=MaxLeverageFactorRiskProps(max_leverage_factor=5.0))
 
         # Crea el trading director y ejecuta el metodo principal
-        TRADING_DIRECTOR = TradingDirector(events_queue=events_queue, data=DATA, signal_generator=SIGNAL_GENERATOR, position_sizer=POSITION_SIZER)
+        TRADING_DIRECTOR = TradingDirector(events_queue=events_queue, 
+                                           data=DATA_PROVIDER, 
+                                           signal_generator=SIGNAL_GENERATOR, 
+                                           position_sizer=POSITION_SIZER,
+                                           risk_manager=RISK_MANAGER)
+        
         TRADING_DIRECTOR.execute()
 
     except KeyboardInterrupt:

@@ -43,7 +43,7 @@ class RiskManager(IRiskManager):
 
     def _compute_value_of_position_in_account_currency(self, symbol: str, volume: float, position_type: str) -> float:
 
-        symbol_info = Client.get_symbol_info(symbol)
+        symbol_info = Client().get_symbol_info(symbol)
         min_qty = float(symbol_info['filters'][1]['minQty'])
         traded_units =  0.0                                     # Unidades operadas en las unidades del symbol
 
@@ -51,7 +51,7 @@ class RiskManager(IRiskManager):
             traded_units = volume
 
             # Valor de las unidades operadas en la divisa cotizada del simbolo
-            value_traded_in_profit_ccy = traded_units * self.DATA_PROVIDER.get_latest_tick(symbol)['bid']
+            value_traded_in_profit_ccy = traded_units * float(self.DATA_PROVIDER.get_latest_tick(symbol)[0]['price'])
 
             # Valor de las unidades operadas en la divisa de la cuenta
             value_traded_in_account_ccy = Utils.convert_currency_amount_to_another_currency(value_traded_in_profit_ccy, 
@@ -69,12 +69,13 @@ class RiskManager(IRiskManager):
 
         # Crea el order_event a partir del sizing_event y el volumen
         order_event = OrderEvent(symbol=sizing_event.symbol,
+                                    signal=sizing_event.signal,
                                     target_order=sizing_event.target_order,
                                     target_price=sizing_event.target_price,
                                     order_id=sizing_event.order_id,
                                     sl=sizing_event.sl,
                                     tp=sizing_event.tp,
-                                    volume=sizing_event.volume)
+                                    volume=volume)
         
         # Coloca el order_event en la cola de eventos
         self.events_queue.put(order_event)
@@ -90,7 +91,7 @@ class RiskManager(IRiskManager):
         new_position_value = self._compute_value_of_position_in_account_currency(sizing_event.symbol, sizing_event.volume, position_type)
         
         # Obtiene el nuevo volumen  de la operacio que se quiere ejecutar después de pasar por el risk manager.
-        new_volume = self.risk_management_method.assess_order(sizing_event, current_position_value, new_position_value)
+        new_volume = self.risk_management_method.assess_order(self.DATA_PROVIDER, sizing_event, current_position_value, new_position_value)
 
         # Evalua el nuevo volumen
         if new_volume > 0.0:

@@ -21,27 +21,27 @@ class MaxLeverageFactorRiskManager(IRiskManager):
             return account_value_acc_ccy / account_equity
     
 
-    def _check_new_position_is_compliant_with_max_leverege_factor(self, sizing_event: SizingEvent, current_position_value_acc_ccy: float, new_position_value_acc_ccy: float) -> bool:
+    def _check_new_position_is_compliant_with_max_leverege_factor(self, data_provider: DataProvider, sizing_event: SizingEvent, current_position_value_acc_ccy: float, new_position_value_acc_ccy: float) -> bool:
         
         # calcula el nuevo expected account value que tendría la cuenta si ejecutamos la nueva posición
         new_account_value = current_position_value_acc_ccy + new_position_value_acc_ccy
 
         # CAlcula el nuevo factor de apalancamiento si se ejecuta esa posición
-        new_leverage_factor = self._compute_leverege_factor(new_account_value)
+        new_leverage_factor = self._compute_leverege_factor(data_provider, new_account_value)
 
         # Comprueba si el nuevo leverage factor sería mayor a nuestro máximo leverage factor
         if abs(new_leverage_factor) <= self.max_leverage_factor: 
             return True
         else:
-            print(f"RISK MANAGER: La posición {sizing_event.signal} {sizing_event.volume} implica un Leverage Factor de {abs(new_leverage_factor)},
-                  que supera el máx. de {self.max_leverage_factor}")
+            print(f"RISK MANAGER: La posición {sizing_event.signal} {sizing_event.volume} implica un Leverage Factor de {abs(new_leverage_factor)},"
+                  f"que supera el máx. de {self.max_leverage_factor}")
             return False
 
     
-    def assess_order(self, sizing_event: SizingEvent, current_position_value_acc_ccy: float, new_position_value_acc_ccy: float) -> float:
+    def assess_order(self, data_provider: DataProvider, sizing_event: SizingEvent, current_position_value_acc_ccy: float, new_position_value_acc_ccy: float) -> float:
 
         # Método para hacer la función de discoteca (deja pasar la operación o no)
-        if  self. _check_new_position_is_compliant_with_max_leverege_factor(sizing_event, current_position_value_acc_ccy, new_position_value_acc_ccy):
+        if  self. _check_new_position_is_compliant_with_max_leverege_factor(data_provider, sizing_event, current_position_value_acc_ccy, new_position_value_acc_ccy):
             return sizing_event.volume
         else:
             return 0.0

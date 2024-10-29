@@ -9,43 +9,52 @@ class Utils():
 
     @staticmethod
     def convert_currency_amount_to_another_currency(amount: float, from_ccy: str, to_ccy: str) -> float:
-        
-        all_fx_symbol = ("ADAUSDT","ADABTC", "SOLUSDT", "SOLBTC", "FETUSDT", "FETBTC", "INJUSDT", "INJBTC", "LINKUSDT", "LINKBTC", 
-                         "SHIBUSDT", "SHIBBTC", "POLUSDT", "POLBTC", "VETUSDT", "VETBTC", "CFXUSDT", "CFXBTC", "ICPUSDT", "ICPBTC", 
-                         "CHZUSDT", "CHZBTC", "ROSEUSDT", "ROSEBTC", "LINAUSDT", "LINABTC", "HOTUSDT", "HOTBTC", "RSRUSDT", "RSRBTC",
-                         "IOTAUSDT", "IOTABTC", "WINUSDT", "WINBTC", "DOGEUSDT", "DOGEBTC")
-        
+
+        all_fx_symbol = set()
+        exchange_info = Client().get_exchange_info()
+
+        for symbol_info in exchange_info['symbols']:
+            all_fx_symbol.add(symbol_info['symbol'])
+
         from_ccy = from_ccy.upper()
         to_ccy = to_ccy.upper()
 
-        fx_symbol = [symbol for symbol in all_fx_symbol if from_ccy in symbol and to_ccy in symbol][0]  
-        fx_symbol_base = ()
+        # Buscar el símbolo de cambio
+        fx_symbol_candidates = [symbol for symbol in all_fx_symbol if from_ccy in symbol and to_ccy in symbol]
+        
+        if not fx_symbol_candidates:
+            raise ValueError(f"No se encontraron símbolos de cambio para {from_ccy} a {to_ccy}")
 
-        for symbol in fx_symbol:
-            if symbol.endswith('USDT'): 
-                fx_symbol_base = symbol[:-4]
-            elif symbol.endswith('BTC'):
-                fx_symbol_base = symbol[:-3]
-            else:
-                continue
-
-            fx_symbol_base.add(fx_symbol_base)
+        fx_symbol = fx_symbol_candidates[0]
 
         try:
+            # Obtener el último precio del ticker
             tick = Client().get_ticker(symbol=fx_symbol)
 
             if tick is None:
-                raise (f"El símbolo {fx_symbol} no está disponible en la plataforma Binance. Por favor, revisa los símbolos disponibles.")
+                raise ValueError(f"El símbolo {fx_symbol} no está disponible en la plataforma Binance.")
+
+            last_price = float(tick['bidPrice'])
+
+            # Determinar la base del símbolo
+            if fx_symbol.endswith('USDT'):
+                fx_symbol_base = fx_symbol[:-4]  
+            elif fx_symbol.endswith('BTC'):
+                fx_symbol_base = fx_symbol[:-3]  
+            else:
+                raise ValueError(f"El símbolo {fx_symbol} no es válido.")
+
+            # Convierte la cantidad de la divisa origen a la divisa destino
+            if fx_symbol_base == to_ccy:
+                convert_amount = amount * last_price  # Convierte a la divisa base
+            else:
+                convert_amount = amount / last_price  # Convierte a USDT o BTC
+
+            return convert_amount
+
         except Exception as e:
             print(f"ERROR: No se pudo recuperar el último símbolo {fx_symbol}. Exception: {e}")
             return 0.0
-        
-        else:
-            last_price = float(tick['bidPrice'])
-
-            # Convierte la cantidad de la divisa origen a la divisa destino
-            convert_amount = amount / last_price if fx_symbol_base == to_ccy else last_price
-            return convert_amount
     
 
     @staticmethod
