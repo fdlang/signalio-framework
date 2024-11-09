@@ -36,7 +36,7 @@ class TradingDirector():
         return datetime.now().strftime("%d/%m/%Y %H:%M:%S.%f") # format: 12/10/2024 20:30:234
 
 
-    def _handle_signal_event(self, event= SignalEvent):
+    def _handle_signal_event(self, event: SignalEvent):
         # Procesa el signal event
         print(f"{self._dateprint()} - Recibido SIGNAL EVENT de {event.signal} para {event.symbol}")
         self.POSITION_SIZER.size_signal(event)

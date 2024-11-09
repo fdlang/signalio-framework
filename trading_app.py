@@ -40,7 +40,7 @@ if __name__ == "__main__":
         
         POSITION_SIZER = PositionSizer(events_queu=events_queue,
                                         data_provider=DATA_PROVIDER, 
-                                        sizing_properties=FixedSizingProps(volume=0.09))    # 1% de riesgo
+                                        sizing_properties=FixedSizingProps(volume=0.01))    # 1% de riesgo
         
 
         RISK_MANAGER = RiskManager(events_queue=events_queue,
