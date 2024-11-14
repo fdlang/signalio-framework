@@ -60,12 +60,16 @@ class Utils():
     @staticmethod
     def get_usdt_value(asset: str, amount: float) -> float:
 
-        if asset == 'USDT':  # Si la moneda es USDT, no hace falta convertir
+        if asset == 'USDT': 
             return amount
+        
+        if asset == 'NFT' or asset == '1000PEPPER':
+            return 0.0
         
         try:
             # Obtiene el precio de la moneda en USDT
             ticker = Client().get_symbol_ticker(symbol=f"{asset}USDT")
+            
             price_in_usdt = float(ticker['price'])           
             return price_in_usdt * amount
         

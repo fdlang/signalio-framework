@@ -2,6 +2,7 @@ import os
 from binance.client import Client
 from binance.exceptions import BinanceAPIException, BinanceRequestException
 from dotenv import load_dotenv, find_dotenv
+from utils.utils import Utils
 
 class PlatformConnector():
 	def __init__(self, symbols:list):
@@ -150,11 +151,28 @@ class PlatformConnector():
 		return bal_info
 
 
+	def _get_account_balance_usdt(self):
+		# Calcula el saldo total de la billetera en USDT
+		total_usdt_value = 0
+		account_info = self.client.get_account()
+
+		for balance in account_info['balances']:
+			asset = balance['asset']
+			free_balance = float(balance['free'])
+
+			if free_balance > 0:
+				total_usdt_value += Utils.get_usdt_value(asset, free_balance)
+
+		return total_usdt_value 
+
+
 	def _print_account_info(self):
 		"""Obtiene y muestra información de la cuenta."""
 
 		try:
 			account_info = self.client.get_account()
+
+			usdt_balance = next((round(bal[1], 2) for bal in self._account_balance(account_info) if bal[0] == 'USDT'), 0.0)
 				
 			print(f'\n+---------- INFORMACIÓN DE LA CUENTA ----------\n')
 			print(f"| - Comisión Maker: {account_info['makerCommission']}")
@@ -164,6 +182,8 @@ class PlatformConnector():
 			print(f"| - Puede depositar: {account_info['canDeposit']}")
 			print(f"| - Tipo de cuenta: {account_info['accountType']}")
 			print(f"| - ID de usuario: {account_info['uid']}")
+			print(f"| - Valor porfolio: {round(self._get_account_balance_usdt(), 2)} usd")
+			print(f"| - saldo disponible: {usdt_balance} usd")
 			print(f'\n+----------------------------------------------\n')
 
 			print(f"------------ Balance de la cuenta ------------\n")

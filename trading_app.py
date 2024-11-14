@@ -14,7 +14,7 @@ from queue import Queue
 if __name__ == "__main__":
 
     try:
-        symbols = ['ADABTC','ETHBTC', 'SOLUSDT', 'SOLBTC', 'SOLETH']
+        symbols = ['BTCUSDT', 'SOLUSDT', 'ADAUSDT']
         timeframe = "4h"
         order_id = 12345
         slow_ma_perid = 50
