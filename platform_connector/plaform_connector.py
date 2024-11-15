@@ -154,15 +154,17 @@ class PlatformConnector():
 	def _get_account_balance_usdt(self):
 		# Calcula el saldo total de la billetera en USDT
 		total_usdt_value = 0
+		tickers_list = self.client.get_symbol_ticker()
 		account_info = self.client.get_account()
+		tickers = {ticker['symbol']: ticker for ticker in tickers_list}
 
 		for balance in account_info['balances']:
 			asset = balance['asset']
 			free_balance = float(balance['free'])
 
 			if free_balance > 0:
-				total_usdt_value += Utils.get_usdt_value(asset, free_balance)
-
+				total_usdt_value += Utils.get_usdt_value(tickers, asset, free_balance)
+				
 		return total_usdt_value 
 
 
