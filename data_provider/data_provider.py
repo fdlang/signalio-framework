@@ -192,19 +192,15 @@ class DataProvider():
 				self.events_queue.put(data_event)
 
 
-	def get_account_balance_usdt(self):
-		# Calcula el saldo total de la billetera en USDT
-		total_usdt_value = 0
+	def get_account_usdt(self):
 		account_info = self.client.get_account()
+		usdt_account = 0.0
 
 		for balance in account_info['balances']:
-			asset = balance['asset']
-			free_balance = float(balance['free'])
-
-			if float(free_balance) > 0:
-				total_usdt_value += Utils.get_usdt_value(asset, free_balance)
-
-		return total_usdt_value 
+			if balance['asset'] == 'USDT':
+				usdt_account = float(balance['free'])
+				
+		return usdt_account
 
 
 				
