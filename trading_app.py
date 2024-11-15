@@ -40,13 +40,13 @@ if __name__ == "__main__":
         
         POSITION_SIZER = PositionSizer(events_queu=events_queue,
                                         data_provider=DATA_PROVIDER, 
-                                        sizing_properties=FixedSizingProps(volume=0.01))    # 1% de riesgo
+                                        sizing_properties=FixedSizingProps(volume=1.09))    # % de riesgo
         
 
         RISK_MANAGER = RiskManager(events_queue=events_queue,
                                    data_provider=DATA_PROVIDER,
                                    portfolio=PORTFOLIO,
-                                   risk_properties=MaxLeverageFactorRiskProps(max_leverage_factor=5.0))
+                                   risk_properties=MaxLeverageFactorRiskProps(max_leverage_factor=0.0001))
 
         # Crea el trading director y ejecuta el metodo principal
         TRADING_DIRECTOR = TradingDirector(events_queue=events_queue, 
