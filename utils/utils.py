@@ -58,7 +58,7 @@ class Utils():
     
 
     @staticmethod
-    def get_usdt_value(asset: str, amount: float) -> float:
+    def get_usdt_value(tickers: dict, asset: str, amount: float) -> float:
 
         if asset == 'USDT': 
             return amount
@@ -67,13 +67,11 @@ class Utils():
             return 0.0
         
         try:
-            # Obtiene el precio de la moneda en USDT
-            ticker = Client().get_symbol_ticker(symbol=f"{asset}USDT")
-            
-            price_in_usdt = float(ticker['price'])           
+            ticker = tickers.get(f"{asset}USDT")
+            price_in_usdt = float(ticker['price'])  
+
             return price_in_usdt * amount
         
         except Exception as e:
-            # Si no existe un par directo en USDT, se ignora
             print(f"No se pudo obtener el precio de {asset} en USDT. Exception: {e}")
             return 0.0
