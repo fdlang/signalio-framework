@@ -54,7 +54,7 @@ class RiskPctPositionSizer(IPositionSizer):
 			entry_price = signal_event.target_price
 
 		# Consigue los valores que faltan para los cálculos
-		equity = data_provider.get_account_balance_usdt()		# Saldo de la cuenta
+		equity = data_provider.get_account_usdt()				# Saldo de la cuenta
 		volume_step = symbol_info['filters'][1]['stepSize']		# Cambio mínimo de volumen
 		tick_size = symbol_info['filters'][0]['tickSize'] 		# Cambio mínimo de precio 
 		account_ccy = "USDT"									# Divisa de la cuenta
