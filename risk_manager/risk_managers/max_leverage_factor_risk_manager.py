@@ -13,7 +13,7 @@ class MaxLeverageFactorRiskManager(IRiskManager):
     
     def _compute_leverege_factor(self, data_provider: DataProvider, account_value_acc_ccy: float) -> float:
         
-        account_equity = data_provider.get_account_balance_usdt()
+        account_equity = data_provider.get_account_usdt()
 
         if account_equity <= 0:
             return sys.float_info.max
