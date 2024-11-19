@@ -19,7 +19,7 @@ class OrderExecutor():
 
         # Evalua el tipo de orden que se quiere ejecutar y llama al método
         if order_event.target_order == "MARKET":
-            pass
+            self._execute_market_order(order_event)
         else:
             pass
 
