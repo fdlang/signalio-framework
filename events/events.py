@@ -75,7 +75,7 @@ class OrderEvent(BaseEvent):
 class ExecutionEvent(BaseEvent):
     event_type: EventType = EventType.EXECUTION
     symbol: str
-    signal: SignalEvent
+    signal: SignalType
     fill_price: float
     fill_time: datetime
     volume: float
