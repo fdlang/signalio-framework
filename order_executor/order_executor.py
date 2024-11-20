@@ -43,14 +43,14 @@ class OrderExecutor():
         )
 
         # Verifica el resultado de la ejecución de la orden 
-        if self._check_execution_status(market_order):
+        if self._check_execute_status(market_order):
             print(f"Market Order {order_event.signal} para {order_event.symbol} de {order_event.volume} ejecutado correctamente.")
-            self._create_put_execution_event(market_order)
+            self._create_put_execute_event(market_order)
         else:
             print(f"Ha habido un error al ejecutar la orden {order_event.signal} para {order_event.symbol}")
     
 
-    def _check_execution_status(self, market_order) -> bool:
+    def _check_execute_status(self, market_order) -> bool:
 
         if market_order['status'] == self.client.ORDER_STATUS_FILLED:
             return True
@@ -60,14 +60,14 @@ class OrderExecutor():
             return False
     
 
-    def _create_put_execution_event(self, order_result, ) -> None:
+    def _create_put_execute_event(self, order_result, ) -> None:
         
-        exexute_event = ExecutionEvent(symbol=order_result['symbol'],
+        execute_event = ExecutionEvent(symbol=order_result['symbol'],
                                        signal=SignalType.BUY if order_result['side'] == self.client.SIDE_BUY else SignalType.SELL,
-                                       fill_price=order_result['fills'][0]['price'], # REVISAR LOS PRECIOS CUANDO LA ORDEN SE HAGA EN VARIOS TRADES !!
+                                       fill_price=order_result['fills'][0]['price'],    # REVISAR LOS PRECIOS CUANDO LA ORDEN SE HAGA EN VARIOS TRADES !!
                                        fill_time=pd.to_datetime(order_result['transactTime'], unit='ms'),
                                        volume=order_result['executedQty'])
         
-        self.events_queue.put(exexute_event)
+        self.events_queue.put(execute_event)
     
     
