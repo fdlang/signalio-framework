@@ -77,13 +77,14 @@ class OrderExecutor():
 												side = side_type,
 												type = order_type,
 												quantity = order_event.volume,
-												price = order_event.target_price,           # Precio límite
-												stopPrice = order_event.sl,                 # Precio de activación
+												price = order_event.target_price,          		# Precio límite
+												stopPrice = order_event.sl,                 	# Precio de activación
 												newClientOrderId = order_event.order_id,
-												timeInForce = self.client.TIME_IN_FORCE_GTC)                        # válido hasta que se cancele
+												timeInForce = self.client.TIME_IN_FORCE_GTC)	# válido hasta que se cancele
 		
 		# Verifica el resultado de la ejecución de la orden 
 		if self._check_execute_status(pending_order):
+			
 			print(f"Pending Order {order_event.signal} {order_event.target_order} para {order_event.symbol} de {order_event.volume} colacada en {order_event.target_price} correctamente.")
 			self._create_put_execute_event(pending_order)
 		else:
