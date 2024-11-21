@@ -11,6 +11,7 @@ class EventType(str, Enum): # hereda de str y Enum
     SIZING = "SIZING"
     ORDER = "ORDER"
     EXECUTION = "EXECUTION"
+    PENDING = "PENDING"
 
 
 class SignalType(str, Enum): 
@@ -72,8 +73,20 @@ class OrderEvent(BaseEvent):
     volume: float
 
 
+class PlacePendingOrderEvent(BaseEvent):
+    event_type: EventType = EventType.ORDER
+    symbol: str
+    signal: SignalType
+    target_order: OrderType
+    target_price: float
+    order_id: int
+    sl: float # stop loss
+    tp: float # tipe profit
+    volume: float
+
+
 class ExecutionEvent(BaseEvent):
-    event_type: EventType = EventType.EXECUTION
+    event_type: EventType = EventType.PENDING
     symbol: str
     signal: SignalType
     fill_price: float
