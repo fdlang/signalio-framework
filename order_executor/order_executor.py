@@ -1,5 +1,5 @@
 from portfolio.portfolio import Portfolio
-from events.events import OrderEvent, ExecutionEvent, SignalType
+from events.events import OrderEvent, ExecutionEvent, SignalType, PlacePendingOrderEvent
 from platform_connector.plaform_connector import PlatformConnector
 import pandas as pd
 
@@ -86,12 +86,34 @@ class OrderExecutor():
 		if self._check_execute_status(pending_order):
 			
 			print(f"Pending Order {order_event.signal} {order_event.target_order} para {order_event.symbol} de {order_event.volume} colacada en {order_event.target_price} correctamente.")
-			self._create_put_execute_event(pending_order)
+			self._create_put_place_pending_order_event(order_event)
 		else:
 			print(f"Ha habido un error al ejecutar la orden {order_event.signal} para {order_event.symbol}")
 
 
-	def _create_put_execute_event(self, order_result, ) -> None:
+	def _close_position_by_order_id(self, order_id: int, symbol: str) -> None:
+
+		position = self.client.get_open_orders(symbol=symbol)
+
+		if position is None:
+			print(f'ORDER EXECUTE: No existe ninguna orden abierta para el par {symbol}')
+			return
+		
+		for pos in position:
+			if pos['orderId'] == order_id:
+				close_order = self.client.cancel_order(symbol=symbol, orderId=order_id)
+
+
+#########################################################################################################################
+
+# REVISAR EL METODO _close_position_by_order_id Y _send_pending_order PARA VER SI HACE REALMENTE LO QUE SE QUIERE. 
+
+
+
+
+
+
+	def _create_put_execute_event(self, order_result ) -> None:
 		
 		execute_event = ExecutionEvent(symbol = order_result['symbol'],
 									   signal = SignalType.BUY if order_result['side'] == self.client.SIDE_BUY else SignalType.SELL,
@@ -101,4 +123,16 @@ class OrderExecutor():
 		
 		self.events_queue.put(execute_event)
 	
-	
+
+	def _create_put_place_pending_order_event(self, order_event: OrderEvent) -> None:
+
+		placed_order_event = PlacePendingOrderEvent(symbol= order_event.symbol,
+													signal= order_event.signal,
+													target_order= order_event.target_order,
+													target_price= order_event.target_price,
+													order_= order_event.order_id,
+													sl= order_event.sl, 
+													tp= order_event.tp, 
+													volume= order_event.volume)
+		
+		self.events_queue.put(placed_order_event)
