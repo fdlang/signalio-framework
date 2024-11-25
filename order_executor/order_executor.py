@@ -61,26 +61,37 @@ class OrderExecutor():
 	def _send_pending_order(self, order_event: OrderEvent) -> None:
 
 		# comprueba si es de tipo STOP_LOSS o LIMIT
-		if order_event.target_order == "STOP_LOSS_LIMIT":
+		if order_event.target_order == self.client.ORDER_TYPE_STOP_LOSS_LIMIT:
 			
 			order_type = self.client.ORDER_TYPE_STOP_LOSS_LIMIT
-			side_type = self.client.SIDE_BUY if order_event.signal == "BUY" else self.client.SIDE_SELL
+			specific_params = {"stopPrice": order_event.sl} 	# Precio de activación
+		
+		elif order_event.target_order == self.client.ORDER_TYPE_STOP_LOSS:
+			order_type = self.client.ORDER_TYPE_STOP_LOSS
+			specific_params = {"stopPrice": order_event.sl} 	
 
-		elif order_event.target_order == "LIMIT":
+		elif order_event.target_order == self.client.ORDER_TYPE_LIMIT:
 
 			order_type = self.client.ORDER_TYPE_LIMIT
-			side_type = self.client.SIDE_BUY if order_event.signal == "BUY" else self.client.SIDE_SELL
+			specific_params = {} 
+
 		else:
 			raise Exception(f"ORDER EXECUTE: La orden pendiente objetivo {order_event.target_order} no es válida.")
+		
+		# Define los parametros
+		side_type = self.client.SIDE_BUY if order_event.signal == "BUY" else self.client.SIDE_SELL
+		orders_params = {
+			"symbol": order_event.symbol,
+			"side": side_type,
+			"type": order_type,
+			"quantity": order_event.volume,
+			"price": order_event.target_price, 				# Precio límite 
+			"newClientOrderId": order_event.order_id,
+			"timeInForce": self.client.TIME_IN_FORCE_GTC 	# válido hasta que se cancele
+		}	
 
-		pending_order = self.client.create_order(symbol =order_event.symbol,
-												side = side_type,
-												type = order_type,
-												quantity = order_event.volume,
-												price = order_event.target_price,          		# Precio límite
-												stopPrice = order_event.sl,                 	# Precio de activación
-												newClientOrderId = order_event.order_id,
-												timeInForce = self.client.TIME_IN_FORCE_GTC)	# válido hasta que se cancele
+		orders_params.update(specific_params)	
+		pending_order = self.client.create_order(**orders_params)													
 		
 		# Verifica el resultado de la ejecución de la orden 
 		if self._check_execute_status(pending_order):
