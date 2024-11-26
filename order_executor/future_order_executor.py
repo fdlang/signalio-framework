@@ -119,6 +119,7 @@ class FutureOrderExecutor():
 					"price": order['price'],
 					"type": order['type'],
 					"quantity": order['origQty'],
+					"reduceOnly": True,
 					"timeInForce": self.client.TIME_IN_FORCE_FOK		# Establece la condición FOK
 				}	
 				
