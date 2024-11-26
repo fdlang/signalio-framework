@@ -74,7 +74,7 @@ class OrderEvent(BaseEvent):
 
 
 class PlacePendingOrderEvent(BaseEvent):
-    event_type: EventType = EventType.ORDER
+    event_type: EventType = EventType.PENDING
     symbol: str
     signal: SignalType
     target_order: OrderType
@@ -86,7 +86,7 @@ class PlacePendingOrderEvent(BaseEvent):
 
 
 class ExecutionEvent(BaseEvent):
-    event_type: EventType = EventType.PENDING
+    event_type: EventType = EventType.EXECUTION
     symbol: str
     signal: SignalType
     fill_price: float
