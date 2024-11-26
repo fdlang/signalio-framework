@@ -8,23 +8,23 @@ from queue import Queue
 
 class OrderExecutor():
 
-	def __init__(self, events_queue: Queue, portfolio: Portfolio, client: PlatformConnector):
+	def __init__(self, events_queue: Queue, portfolio: Portfolio, connector: PlatformConnector):
 
 		self.events_queue = events_queue
 		self.PORTFOLIO = portfolio
-		self.client = client.client
+		self.client = connector.client
 
 
 	def excute_order(self, order_event: OrderEvent) -> None:
 
 		# Evalua el tipo de orden que se quiere ejecutar y llama al método
 		if order_event.target_order == "MARKET":
-			self._execute_market_order(order_event)
+			self._execute_market_order_spot(order_event)
 		else:
-			self._send_pending_order(order_event)
+			self._send_pending_order_spot(order_event)
 
 	
-	def _execute_market_order(self, order_event: OrderEvent) -> None:
+	def _execute_market_order_spot(self, order_event: OrderEvent) -> None:
 
 		# comprueba si la orden es de venta o compra
 		if order_event.signal == "BUY" :
@@ -32,7 +32,7 @@ class OrderExecutor():
 		elif order_event.signal == "SELL":
 			order_side = self.client.SIDE_SELL
 		else:
-			raise Exception(f"ORDER EXECUTOR: La señal {order_event.signal} no es válida.")
+			raise Exception(f"SPOT ORDER EXECUTOR: La señal {order_event.signal} no es válida.")
 		
 		market_order = self.client.create_order(symbol=order_event.symbol,
 												side=order_side,
@@ -42,11 +42,35 @@ class OrderExecutor():
 
 		# Verifica el resultado de la ejecución de la orden 
 		if self._check_execute_status(market_order):
-			print(f"Market Order {order_event.signal} para {order_event.symbol} de {order_event.volume} ejecutado correctamente.")
+			print(f"Spot Market Order: {order_event.signal} para {order_event.symbol} de {order_event.volume} ejecutado correctamente.")
 			self._create_put_execute_event(market_order)
 		else:
 			print(f"Ha habido un error al ejecutar la orden {order_event.signal} para {order_event.symbol}")
 	
+
+	def _execute_market_order_future(self, order_event: OrderEvent) -> None:
+
+		# comprueba si la orden es de venta o compra
+		if order_event.signal == "BUY" :
+			order_side = self.client.SIDE_BUY
+		elif order_event.signal == "SELL":
+			order_side = self.client.SIDE_SELL
+		else:
+			raise Exception(f"FUTURE ORDER EXECUTOR: La señal {order_event.signal} no es válida.")
+		
+		market_order = self.client.futures_create_order(symbol=order_event.symbol,
+														side=order_side,
+														type=self.client.ORDER_TYPE_MARKET,
+														quantity=order_event.volume,
+														newClientOrderId = order_event.order_id)
+
+		# Verifica el resultado de la ejecución de la orden 
+		if self._check_execute_status(market_order):
+			print(f"Future Market Order: {order_event.signal} para {order_event.symbol} de {order_event.volume} ejecutado correctamente.")
+			self._create_put_execute_event(market_order)
+		else:
+			print(f"Ha habido un error al ejecutar la orden {order_event.signal} para {order_event.symbol}")
+
 
 	def _check_execute_status(self, market_order) -> bool:
 
@@ -58,13 +82,13 @@ class OrderExecutor():
 			return False
 	
 
-	def _send_pending_order(self, order_event: OrderEvent) -> None:
+	def _send_pending_order_spot(self, order_event: OrderEvent) -> None:
 
 		# comprueba si es de tipo STOP_LOSS o LIMIT
 		if order_event.target_order == self.client.ORDER_TYPE_STOP_LOSS_LIMIT:
 			
 			order_type = self.client.ORDER_TYPE_STOP_LOSS_LIMIT
-			specific_params = {"stopPrice": order_event.sl} 	# Precio de activación
+			specific_params = {"stopPrice": order_event.sl}		# Precio de activación
 		
 		elif order_event.target_order == self.client.ORDER_TYPE_STOP_LOSS:
 			order_type = self.client.ORDER_TYPE_STOP_LOSS
@@ -85,9 +109,9 @@ class OrderExecutor():
 			"side": side_type,
 			"type": order_type,
 			"quantity": order_event.volume,
-			"price": order_event.target_price, 				# Precio límite 
+			"price": order_event.target_price, 					# Precio límite 
 			"newClientOrderId": order_event.order_id,
-			"timeInForce": self.client.TIME_IN_FORCE_GTC 	# válido hasta que se cancele
+			"timeInForce": self.client.TIME_IN_FORCE_GTC 		# válido hasta que se cancele
 		}	
 
 		orders_params.update(specific_params)	
@@ -101,27 +125,79 @@ class OrderExecutor():
 		else:
 			print(f"Ha habido un error al ejecutar la orden {order_event.signal} para {order_event.symbol}")
 
+	
+	def _send_pending_order_future(self, order_event: OrderEvent) -> None:
 
-	def _close_position_by_order_id(self, order_id: int, symbol: str) -> None:
+		# comprueba si es de tipo STOP_LOSS o LIMIT
+		if order_event.target_order == self.client.ORDER_TYPE_STOP_LOSS_LIMIT:
+			
+			order_type = self.client.ORDER_TYPE_STOP_LOSS_LIMIT
+			specific_params = {"stopPrice": order_event.sl}		# Precio de activación
+		
+		elif order_event.target_order == self.client.ORDER_TYPE_STOP_LOSS:
+			order_type = self.client.ORDER_TYPE_STOP_LOSS
+			specific_params = {"stopPrice": order_event.sl} 	
 
-		position = self.client.get_open_orders(symbol=symbol)
+		elif order_event.target_order == self.client.ORDER_TYPE_LIMIT:
 
-		if position is None:
-			print(f'ORDER EXECUTE: No existe ninguna orden abierta para el par {symbol}')
+			order_type = self.client.ORDER_TYPE_LIMIT
+			specific_params = {} 
+
+		else:
+			raise Exception(f"FUTURE ORDER EXECUTE: La orden pendiente objetivo {order_event.target_order} no es válida.")
+		
+		# Define los parametros
+		side_type = self.client.SIDE_BUY if order_event.signal == "BUY" else self.client.SIDE_SELL
+		orders_params = {
+			"symbol": order_event.symbol,
+			"side": side_type,
+			"type": order_type,
+			"quantity": order_event.volume,
+			"price": order_event.target_price, 					# Precio límite 
+			"newClientOrderId": order_event.order_id,
+			"timeInForce": self.client.TIME_IN_FORCE_GTC 		# válido hasta que se cancele
+		}	
+
+		orders_params.update(specific_params)	
+		pending_order = self.client.futures_create_order(**orders_params)													
+		
+		# Verifica el resultado de la ejecución de la orden 
+		if self._check_execute_status(pending_order):
+			
+			print(f"Future Pending Order: {order_event.signal} {order_event.target_order} para {order_event.symbol} de {order_event.volume} colacada en {order_event.target_price} correctamente.")
+			self._create_put_place_pending_order_event(order_event)
+		else:
+			print(f"Ha habido un error al ejecutar la orden {order_event.signal} para {order_event.symbol}")
+	
+
+	def _close_position_future_by_order_id(self, order_id: int, symbol: str) -> None:
+
+		orders = self.client.futures_get_order(symbol=symbol)
+
+		if not orders:
+			print(f'FUTURE ORDER EXECUTE: No existe ninguna orden abierta para el par {symbol}')
 			return
 		
-		for pos in position:
-			if pos['orderId'] == order_id:
-				close_order = self.client.cancel_order(symbol=symbol, orderId=order_id)
+		for order in orders:
+			if order['orderId'] == order_id:
 
+				orders_params = {
+					"symbol": order['symbol'],
+					"side": self.client.SIDE_BUY if order['side'] == self.client.SIDE_SELL else self.client.SIDE_SELL,
+					"price": order['price'],
+					"type": order['type'],
+					"quantity": order['origQty'],
+					"timeInForce": self.client.TIME_IN_FORCE_FOK		# Establece la condición FOK
+				}	
+				
+				result = self.client.futures_create_order(**orders_params)
 
-#########################################################################################################################
-
-# REVISAR EL METODO _close_position_by_order_id Y _send_pending_order PARA VER SI HACE REALMENTE LO QUE SE QUIERE. 
-
-
-
-
+				# Verifica el resultado de la ejecución de la orden 
+				if self._check_execute_status(result):
+					print(f"Orden de futuros con id {order_id} en par {symbol} y volumen {result['executedQty']} se ha cerrado correctamente.")
+					self._create_put_execute_event(result)
+				else:
+					print(f"Ha habido un error al cerrar la orden de futuros {order_id} en {symbol} con volumen {result['executedQty']}")
 
 
 	def _create_put_execute_event(self, order_result ) -> None:
@@ -141,7 +217,7 @@ class OrderExecutor():
 													signal= order_event.signal,
 													target_order= order_event.target_order,
 													target_price= order_event.target_price,
-													order_= order_event.order_id,
+													order_id= order_event.order_id,
 													sl= order_event.sl, 
 													tp= order_event.tp, 
 													volume= order_event.volume)
