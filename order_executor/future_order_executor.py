@@ -102,13 +102,14 @@ class FutureOrderExecutor():
 			print(f"Ha habido un error al ejecutar la orden {order_event.signal} para {order_event.symbol}")
 	
 
-	def _close_position_future_by_order_id(self, order_id: int, symbol: str) -> None:
+	def close_position_future_by_order_id(self, order_id: int, symbol: str) -> None:
 
-		orders = self.client.futures_get_order(symbol=symbol)
+		orders = self.client.futures_get_open_orders()
 
 		if not orders:
-			print(f'FUTURE ORDER EXECUTE: No existe ninguna orden abierta para el par {symbol}')
+			print(f'FUTURE ORDER EXECUTE: No existe ninguna orden abierta.')
 			return
+		
 		
 		for order in orders:
 			if order['orderId'] == order_id:
@@ -119,10 +120,9 @@ class FutureOrderExecutor():
 					"price": order['price'],
 					"type": order['type'],
 					"quantity": order['origQty'],
-					"reduceOnly": True,
 					"timeInForce": self.client.TIME_IN_FORCE_FOK		# Establece la condición FOK
 				}	
-				
+					
 				result = self.client.futures_create_order(**orders_params)
 
 				# Verifica el resultado de la ejecución de la orden 
@@ -131,6 +131,10 @@ class FutureOrderExecutor():
 					self._create_put_execute_event(result)
 				else:
 					print(f"Ha habido un error al cerrar la orden de futuros {order_id} en {symbol} con volumen {result['executedQty']}")
+			else:
+				print(f'FUTURE ORDER EXECUTE: No existe ninguna orden abierta. Para el simbolo {symbol}, id: {order_id}')
+				
+	
 
 
 	def _create_put_execute_event(self, order_result ) -> None:

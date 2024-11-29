@@ -102,6 +102,25 @@ class SpotOrderExecutor():
 			print(f"Ha habido un error al ejecutar la orden {order_event.signal} para {order_event.symbol}")
 
 
+	def cancel_pending_order_by_symbol_and_id(self, symbol, order_id) -> None:
+
+		order = self.client.get_open_orders(symbol=symbol)
+
+		if order is None:
+			print(f"SPOT ORDER EXECUTE: No existe ninguna orden pendiente parfa el symbolo {symbol}")
+			return
+
+		for key in order:
+			if key['orderId'] == order_id:
+				cancel_order = self.client.cancel_order(symbol=symbol, orderId=order_id)
+
+			# Verifica el resultado de la cancelacion de la orden 
+			if self._check_execute_status(cancel_order):
+				print(f"Orden pendiente para symbol: {symbol} con id: {order_id} y volumen: {key['']}, se ha cancelado correctamente,.")
+			else:
+				print(f"Ha habido un error al ejecutar la orden {order_id} para {symbol}")
+
+
 	def _create_put_execute_event(self, order_result ) -> None:
 		
 		execute_event = ExecutionEvent(symbol = order_result['symbol'],
