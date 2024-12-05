@@ -16,7 +16,7 @@ if __name__ == "__main__":
     try:
         symbols = ['BTCUSDT', 'SOLUSDT', 'ADAUSDT']
         timeframe = "4h"
-        order_id = 12345
+        new_order_id = 12345
         slow_ma_perid = 50
         fast_ma_perid = 14
 
@@ -30,7 +30,7 @@ if __name__ == "__main__":
                             symbol_list=symbols, 
                             timeframe=timeframe)
         
-        PORTFOLIO = Portfolio(order_id= order_id, data_provider=DATA_PROVIDER)
+        PORTFOLIO = Portfolio(order_id= new_order_id, data_provider=DATA_PROVIDER)
         SIGNAL_GENERATOR = SignalMACrossover(event_queue=events_queue, 
                                             data=DATA_PROVIDER, 
                                             portfolio=PORTFOLIO,
