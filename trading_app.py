@@ -7,6 +7,7 @@ from position_sizer.properties.position_sizer_properties import MinSizingProps, 
 from portfolio.portfolio import Portfolio
 from risk_manager.risk_manager import RiskManager
 from risk_manager.properties.risk_manager_properties import MaxLeverageFactorRiskProps
+from order_executor.spot_order_executor import SpotOrderExecutor
 
 from queue import Queue
 
@@ -14,7 +15,7 @@ from queue import Queue
 if __name__ == "__main__":
 
     try:
-        symbols = ['BTCUSDT', 'SOLUSDT', 'ADAUSDT']
+        symbols = ['HBARUSDT', 'SOLUSDT']
         timeframe = "4h"
         new_order_id = 12345
         slow_ma_perid = 50
@@ -47,13 +48,19 @@ if __name__ == "__main__":
                                    data_provider=DATA_PROVIDER,
                                    portfolio=PORTFOLIO,
                                    risk_properties=MaxLeverageFactorRiskProps(max_leverage_factor=0.0001))
-
+        
+        ORDER_EXECUTOR = SpotOrderExecutor(connector=CONNECT.client,
+                                           events_queue=events_queue,
+                                           portfolio=PORTFOLIO,
+                                           )
+        
         # Crea el trading director y ejecuta el metodo principal
         TRADING_DIRECTOR = TradingDirector(events_queue=events_queue, 
                                            data=DATA_PROVIDER, 
                                            signal_generator=SIGNAL_GENERATOR, 
                                            position_sizer=POSITION_SIZER,
-                                           risk_manager=RISK_MANAGER)
+                                           risk_manager=RISK_MANAGER,
+                                           order_execute=ORDER_EXECUTOR)
         
         TRADING_DIRECTOR.execute()
 
