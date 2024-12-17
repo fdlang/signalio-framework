@@ -57,7 +57,8 @@ class TradingDirector():
     
     def _handle_order_event(self, event: OrderEvent):
         print(f"{self._dateprint()} - Recibido ORDER EVENT con volumen {event.volume}  para {event.signal} en {event.symbol}")
-        self.ORDER_EXECUTE.excute_order(event)
+        # self.ORDER_EXECUTE.excute_order(event) 
+        ########################################
 
 
     def _handle_execution_event(self, event: ExecutionEvent):

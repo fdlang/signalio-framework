@@ -1,6 +1,7 @@
 from portfolio.portfolio import Portfolio
 from events.events import OrderEvent, ExecutionEvent, SignalType, PlacePendingOrderEvent
 from platform_connector.plaform_connector import PlatformConnector
+from binance.exceptions import BinanceAPIException
 import pandas as pd
 
 from queue import Queue
@@ -34,18 +35,24 @@ class SpotOrderExecutor():
 		else:
 			raise Exception(f"SPOT ORDER EXECUTOR: La señal {order_event.signal} no es válida.")
 		
-		market_order = self.client.create_order(symbol=order_event.symbol,
-												side=order_side,
-												type=self.client.ORDER_TYPE_MARKET,
-												quantity=order_event.volume,
-												newClientOrderId = order_event.order_id)
+		try:
+			market_order = self.client.create_order(symbol=order_event.symbol,
+													side=order_side,
+													type=self.client.ORDER_TYPE_MARKET,
+													quantity=order_event.volume,
+													newClientOrderId = order_event.order_id)
 
-		# Verifica el resultado de la ejecución de la orden 
-		if self._check_execute_status(market_order):
-			print(f"Spot Market Order: {order_event.signal} para {order_event.symbol} de {order_event.volume} ejecutado correctamente.")
-			self._create_put_execute_event(market_order)
-		else:
-			print(f"Ha habido un error al ejecutar la orden {order_event.signal} para {order_event.symbol}")
+			# Verifica el resultado de la ejecución de la orden 
+			if self._check_execute_status(market_order):
+				print(f"Spot Market Order: {order_event.signal} para {order_event.symbol} de {order_event.volume} ejecutado correctamente.")
+				self._create_put_execute_event(market_order)
+			else:
+				print(f"Ha habido un error al ejecutar la orden {order_event.signal} para {order_event.symbol}")
+		except BinanceAPIException as e:
+			if e.code == -1013 and "NOTIONAL" in e.message:
+				print(f"Error SPOT ORDER EXECUTOR: El monto nominal para {order_event.symbol} es demasiado bajo. Volumen {order_event.volume}")
+			else:
+				print(f"ERROR SPOT ORDER EXECUTOR: {e}")
 
 
 	def _check_execute_status(self, market_order) -> bool:
@@ -102,23 +109,22 @@ class SpotOrderExecutor():
 			print(f"Ha habido un error al ejecutar la orden {order_event.signal} para {order_event.symbol}")
 
 
-	def cancel_pending_order_by_symbol_and_id(self, symbol, order_id) -> None:
+	def cancel_pending_order_by_symbol(self, symbol) -> None:
 
 		order = self.client.get_open_orders(symbol=symbol)
 
 		if order is None:
-			print(f"SPOT ORDER EXECUTE: No existe ninguna orden pendiente parfa el symbolo {symbol}")
+			print(f"SPOT ORDER EXECUTE: No existe ninguna orden pendiente para el symbolo {symbol}")
 			return
 
 		for key in order:
-			if key['orderId'] == order_id:
-				cancel_order = self.client.cancel_order(symbol=symbol, orderId=order_id)
+			cancel_order = self.client.cancel_order(symbol=symbol, orderId=key['orderId'])
 
 			# Verifica el resultado de la cancelacion de la orden 
 			if self._check_execute_status(cancel_order):
-				print(f"Orden pendiente para symbol: {symbol} con id: {order_id} y volumen: {key['']}, se ha cancelado correctamente,.")
+				print(f"Orden pendiente para symbol: {symbol} con id: {key['orderId']} y volumen: {key['']}, se ha cancelado correctamente,.")
 			else:
-				print(f"Ha habido un error al ejecutar la orden {order_id} para {symbol}")
+				print(f"Ha habido un error al ejecutar la orden {key['orderId']} para {symbol}")
 
 
 	def _create_put_execute_event(self, order_result ) -> None:

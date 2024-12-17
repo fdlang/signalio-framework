@@ -2,6 +2,7 @@ from ..interfaces.signal_generator_interface import ISignalGererator
 from data_provider.data_provider import DataProvider
 from events.events import DataEvent, SignalEvent
 from portfolio.portfolio import Portfolio
+from order_executor.spot_order_executor import SpotOrderExecutor
 from queue import Queue
 import pandas as pd
 
@@ -9,11 +10,13 @@ import pandas as pd
 class SignalMACrossover(ISignalGererator):
 	
 	
-	def __init__(self, event_queue: Queue, data: DataProvider, portfolio: Portfolio, timeframe: str, fast_period: int, slow_period: int):
+	def __init__(self, event_queue: Queue, data: DataProvider, portfolio: Portfolio, spot_order_executer: SpotOrderExecutor, timeframe: str, fast_period: int, slow_period: int):
 
 		self.event_queue = event_queue
 		self.DATA = data
 		self.PORTFOLIO = portfolio
+		self.SPOT_ORDER_EXECUTOR = spot_order_executer
+
 		self.timeframe = timeframe
 		self.fast_period = fast_period if fast_period > 1 else 2
 		self.slow_period = slow_period if slow_period > 2 else 3
@@ -57,10 +60,14 @@ class SignalMACrossover(ISignalGererator):
 
 			# Detecta una señal de compra
 			if open_position['LONG'] == 0 and fast_ma > slow_ma:
+				if open_position['SHORT'] > 0:
+					self.SPOT_ORDER_EXECUTOR.cancel_pending_order_by_symbol(symbol)
 				signal = "BUY"
 
 			# señal de venta
 			elif open_position['SHORT'] == 0 and slow_ma > fast_ma: 
+				if open_position['LONG'] > 0:
+					self.SPOT_ORDER_EXECUTOR.cancel_pending_order_by_symbol(symbol)
 				signal = "SELL"
 			else:
 				signal = ""
