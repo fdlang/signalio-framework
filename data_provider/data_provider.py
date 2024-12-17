@@ -3,7 +3,6 @@ from binance.exceptions import BinanceAPIException, BinanceRequestException
 from typing import Dict
 from datetime import datetime
 from events.events import DataEvent
-from utils.utils import Utils
 from queue import Queue
 
 

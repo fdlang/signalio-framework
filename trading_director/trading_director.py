@@ -4,6 +4,8 @@ from position_sizer.position_sizer import PositionSizer
 from risk_manager.risk_manager import RiskManager
 from events.events import DataEvent, SignalEvent, SizingEvent, OrderEvent, ExecutionEvent, PlacePendingOrderEvent
 from order_executor.spot_order_executor import SpotOrderExecutor
+from notifications.notification import NotificationService
+
 from typing import Dict, Callable
 from datetime import datetime
 import queue, time
@@ -11,7 +13,8 @@ import queue, time
 
 class TradingDirector():
 
-    def __init__(self, events_queue: queue.Queue, data: DataProvider, signal_generator: ISignalGererator, position_sizer: PositionSizer, risk_manager: RiskManager, order_execute: SpotOrderExecutor):
+    def __init__(self, events_queue: queue.Queue, data: DataProvider, signal_generator: ISignalGererator, position_sizer: PositionSizer, 
+                 risk_manager: RiskManager, order_execute: SpotOrderExecutor, notification_service: NotificationService):
 
         self.events_queue = events_queue
 
@@ -21,6 +24,7 @@ class TradingDirector():
         self.POSITION_SIZER = position_sizer
         self.RISK_MANAGER = risk_manager
         self.ORDER_EXECUTE = order_execute
+        self.NOTIFICATIONS = notification_service
 
         # controlador de trading
         self.continue_trading: bool = True
@@ -43,6 +47,7 @@ class TradingDirector():
     def _handle_signal_event(self, event: SignalEvent):
         print(f"{self._dateprint()} - Recibido SIGNAL EVENT de {event.signal} para {event.symbol}")
         self.POSITION_SIZER.size_signal(event)
+        self._process_execution_or_pending_events(event)
 
 
     def _handle_data_event(self, event:DataEvent):
@@ -71,9 +76,16 @@ class TradingDirector():
         self._process_execution_or_pending_events(event)
 
     
-    def _process_execution_or_pending_events(self, event: ExecutionEvent | PlacePendingOrderEvent):
+    def _process_execution_or_pending_events(self, event: ExecutionEvent | PlacePendingOrderEvent | SizingEvent):
         # aquí se puede colocar codigo para generar mensajes de telegram o lo que se necesite. 
-        pass
+        
+        if isinstance(event, SignalEvent):
+            self.NOTIFICATIONS.send_notification(tittle=f"Señal de trading", 
+                                                 message=f"Recibida señal de {event.signal} para {event.symbol} de tipo {event.signal} al precio {event.target_price}")
+        
+        if isinstance(event, ExecutionEvent):
+            self.NOTIFICATIONS.send_notification(tittle=f"Execution Event {event.fill_time}", 
+                                                 message=f"Se ha ejecutado una orden de {event.event_type} para {event.symbol} de tipo {event.signal} al precio {event.fill_price} con un volumen de {event.volume}")
 
 
     def execute(self) -> None:

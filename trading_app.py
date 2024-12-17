@@ -8,8 +8,10 @@ from portfolio.portfolio import Portfolio
 from risk_manager.risk_manager import RiskManager
 from risk_manager.properties.risk_manager_properties import MaxLeverageFactorRiskProps
 from order_executor.spot_order_executor import SpotOrderExecutor
+from notifications.notification import NotificationService, TelegramNotificationProperties
 
 from queue import Queue
+import os
 
 
 if __name__ == "__main__":
@@ -58,13 +60,18 @@ if __name__ == "__main__":
                                             fast_period=fast_ma_perid, 
                                             slow_period=slow_ma_perid)
         
+        NOTIFICATIONS = NotificationService(
+            properties=TelegramNotificationProperties(token=os.getenv('token'),
+                                                      chat_id=os.getenv('chat_id')))
+        
         # Crea el trading director y ejecuta el metodo principal
         TRADING_DIRECTOR = TradingDirector(events_queue=events_queue, 
                                            data=DATA_PROVIDER, 
                                            signal_generator=SIGNAL_GENERATOR, 
                                            position_sizer=POSITION_SIZER,
                                            risk_manager=RISK_MANAGER,
-                                           order_execute=ORDER_EXECUTOR)
+                                           order_execute=ORDER_EXECUTOR,
+                                           notification_service=NOTIFICATIONS)
         
         TRADING_DIRECTOR.execute()
 
