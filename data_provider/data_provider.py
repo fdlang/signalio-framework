@@ -51,11 +51,12 @@ class DataProvider():
 		limit = 2 # limite de velas
 
 		try:
-			# Recupera los datos de las 2 ultimas velas
+			# Recupera los datos de las ultimas velas
 			klines = self.client.get_klines(symbol=symbol,interval=interval,limit=limit)
 
 			if klines is None:
 				print(f"El símbolo {klines} no existe o no se ha podido recuperar sus datos")
+				return pd.Series()
 
 			else:
 				# Crea la cabecera del DataFrame
@@ -99,43 +100,52 @@ class DataProvider():
 		except BinanceRequestException as e:
 			print(f'Error de solicitud a Binance: {e}')
 
-		# si algo sale mal devielve None
-		return None
+		# si algo sale mal devuelve series vacias
+		return pd.Series()
 
 
 	def get_latest_closed_bars(self, symbol: str, timeframe: str, num_bars: int = 1) -> pd.DataFrame:
 
 		# Define los paramertros adecuados
-		interval = timeframe # intervalo de tiempo para las velas 
+		interval = self._map_timeframes(timeframe) # intervalo de tiempo para las velas 
 		limit = num_bars if num_bars > 0 else 1
 		
 		try:
-			# Recupera los datos de las 2 ultimas velas
+			# Recupera los datos de las ultimas velas
 			klines = self.client.get_klines(symbol=symbol,interval=interval,limit=limit)
 
 			if klines is None:
 				print(f"El símbolo {klines} no existe o no se ha podido recuperar sus datos")
 				return pd.DataFrame()
 
-			else:
-				# Crea la cabecera del DataFrame
-				barss = pd.DataFrame(klines, columns=[
-					'Open time', 'Open', 'High', 'Low', 'Close', 'Volume',
-					'Close time', 'Quote asset volume', 'Number of trades',
-					'Taker buy base asset volume', 'Taker buy quote asset volume', 'Ignore'
-				])
+			
+			# Crea la cabecera del DataFrame
+			barss = pd.DataFrame(klines, columns=[
+				'Open time', 'Open', 'High', 'Low', 'Close', 'Volume',
+				'Close time', 'Quote asset volume', 'Number of trades',
+				'Taker buy base asset volume', 'Taker buy quote asset volume', 'Ignore'
+			])
 
-				# Convierte la columna Open time a datatime
-				barss['Open time'] = pd.to_datetime(barss['Open time'], unit='ms') 
-				barss.set_index('Open time', inplace=True)
+			# Convierte la columna Open time a datatime
+			barss['Open time'] = pd.to_datetime(barss['Open time'], unit='ms') 
+			barss['Close time'] = pd.to_datetime(barss['Close time'], unit='ms').dt.tz_localize('UTC')
 
-				# Renombra ciertas columnas
-				barss.rename(columns={
-					'Quote asset volume':'Qte Asset Vol', 
-					'Number of trades':'Num Trades', 
-					'Taker buy base asset volume':'Taker Buy Vol', 
-					'Taker buy quote asset volume':'Taker Qte Vol'
-				}, inplace=True) 
+			barss.set_index('Open time', inplace=True)
+
+			# Renombra ciertas columnas
+			barss.rename(columns={
+				'Quote asset volume':'Qte Asset Vol', 
+				'Number of trades':'Num Trades', 
+				'Taker buy base asset volume':'Taker Buy Vol', 
+				'Taker buy quote asset volume':'Taker Qte Vol'
+			}, inplace=True) 
+				
+			# Filtrar solo las velas que ya han cerrado
+			now_utc = datetime.now(timezone.utc)
+			closed_candles = barss[barss['Close time'] <= now_utc]
+
+			# Devolver solo las últimas `num_bars` velas cerradas
+			return closed_candles.tail(num_bars)
 
 		except BinanceAPIException as e:
 			print(f"No se han podido recuperar los datos de la última vela de {symbol} {timeframe}. ERROR: {e} ")
@@ -144,9 +154,8 @@ class DataProvider():
 		except BinanceRequestException as e:
 			print(f'Error de solicitud a Binance: {e}')
 		
-		else:
-			# si todo ok devuelve el dataframe
-			return barss
+		# si algo sale mal devuelve el dataframe vacio
+		return pd.DataFrame()
 
 
 	def get_latest_tick(self, symbol: str) -> dict:
