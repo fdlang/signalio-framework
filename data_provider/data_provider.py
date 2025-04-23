@@ -1,7 +1,7 @@
 import pandas as pd
 from binance.exceptions import BinanceAPIException, BinanceRequestException
 from typing import Dict
-from datetime import datetime
+from datetime import datetime, timezone
 from events.events import DataEvent
 from queue import Queue
 
@@ -67,6 +67,10 @@ class DataProvider():
 
 				# Convierte la columna Open time a datatime
 				barss['Open time'] = pd.to_datetime(barss['Open time'], unit='ms') 
+				barss['Close time'] = pd.to_datetime(barss['Close time'], unit='ms') 
+
+				barss['Close time'] = barss['Close time'].dt.tz_localize('UTC')
+				
 				barss.set_index('Open time', inplace=True)
 
 				# Renombra ciertas columnas
@@ -77,17 +81,26 @@ class DataProvider():
 					'Taker buy quote asset volume':'Taker Qte Vol'
 				}, inplace=True) 
 
-				# accede a la primera fila del dataframe 'penultima vela' 
-				bars_np_array = barss.iloc[[0]] 
+				closed_candles = barss[barss['Close time'] <= datetime.now(timezone.utc)]
+
+				if not closed_candles.empty:
+					latest_closed_candle = closed_candles.iloc[-1]
+					
+					return latest_closed_candle # Si hay velas cerradas, devuelve la última vela cerrada
+
+				else:
+					print("No hay velas cerradas en el tiempo especificado.")
+					return None
 
 		except BinanceAPIException as e:
 			print(f"El símbolo {symbol} no existe o no se ha podido recuperar sus datos.")
 		except AttributeError as e:
 			print(f"El intervalo de tiempo {interval} no es valido. Error: {e}")
-		
-		else:
-			# si todo ok devuelve una serie
-			return bars_np_array.iloc[-1]
+		except BinanceRequestException as e:
+			print(f'Error de solicitud a Binance: {e}')
+
+		# si algo sale mal devielve None
+		return None
 
 
 	def get_latest_closed_bars(self, symbol: str, timeframe: str, num_bars: int = 1) -> pd.DataFrame:
@@ -128,6 +141,8 @@ class DataProvider():
 			print(f"No se han podido recuperar los datos de la última vela de {symbol} {timeframe}. ERROR: {e} ")
 		except AttributeError as e:
 			print(f"El intervalo de tiempo {interval} no es valido.")
+		except BinanceRequestException as e:
+			print(f'Error de solicitud a Binance: {e}')
 		
 		else:
 			# si todo ok devuelve el dataframe
