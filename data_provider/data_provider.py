@@ -91,7 +91,7 @@ class DataProvider():
 
 				else:
 					print("No hay velas cerradas en el tiempo especificado.")
-					return None
+					return pd.Series()
 
 		except BinanceAPIException as e:
 			print(f"El símbolo {symbol} no existe o no se ha podido recuperar sus datos.")
