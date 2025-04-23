@@ -51,7 +51,7 @@ class RiskManager(IRiskManager):
             traded_units = volume
 
             # Valor de las unidades operadas en la divisa cotizada del simbolo
-            value_traded_in_profit_ccy = traded_units * float(self.DATA_PROVIDER.get_latest_tick(symbol)[0]['price'])
+            value_traded_in_profit_ccy = traded_units * float(self.DATA_PROVIDER.get_latest_tick(symbol)["bidPrice"])
 
             # Valor de las unidades operadas en la divisa de la cuenta
             value_traded_in_account_ccy = Utils.convert_currency_amount_to_another_currency(value_traded_in_profit_ccy, 
