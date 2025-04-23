@@ -55,8 +55,8 @@ class SignalMACrossover(ISignalGererator):
 			bars['Close'] = pd.to_numeric(bars['Close'])
 
 			# Calcula el valor de los indicadores
-			fast_ma = bars['Close'][-self.fast_period:].mean()
-			slow_ma = bars['Close'].mean()
+			fast_ma = bars['Close'][-self.fast_period:].astype(float).mean()
+			slow_ma = bars['Close'].astype(float).mean()
 
 			# Detecta una señal de compra
 			if open_position['LONG'] == 0 and fast_ma > slow_ma:
