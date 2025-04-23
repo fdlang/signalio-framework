@@ -161,21 +161,18 @@ class DataProvider():
 	def get_latest_tick(self, symbol: str) -> dict:
 
 		try:
-			tick = self.client.get_recent_trades(symbol=symbol, limit=1)
+			tick = self.client.get_ticker(symbol=symbol)
 
 			if tick is None:
-				print(f"No se ha podido recuperar el últinmo tick de {symbol}")
-				return None
+				print(f"El símbolo {symbol} no existe o no se ha podido recuperar sus datos.")
+				return {}
 
 		except BinanceAPIException as e:
-			print(f"No se ha podido recuperar el ultimo tick, el símbolo {symbol} no es correcto")
-			return None
-		except BinanceRequestException as e:
-			print(f"Algo no ha salido bien a la hora de recuperar el último tick. Binance Error: {e}")
-			return None
-		except Exception as e:
-			print(f"Algo no ha salido bien a la hora de recuperar el último tick. Error: {e}")
-			return None
+			print(f"No se ha podido recuperar el ultimo tick, el símbolo {symbol} no es correcto - Binance Error: {e}")
+			return {}
+		except BinanceRequestException and AttributeError as e:
+			print(f"Algo no ha salido bien a la hora de recuperar el último tick - Binance Error: {e}")
+			return {}
 		
 		else:
 			return tick
