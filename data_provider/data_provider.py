@@ -1,15 +1,16 @@
 import pandas as pd
-from binance.exceptions import BinanceAPIException, BinanceRequestException
 from typing import Dict
-from datetime import datetime, timezone
 from events.events import DataEvent
+from datetime import datetime, timezone
+from platform_connector.plaform_connector import PlatformConnector
+from binance.exceptions import BinanceAPIException, BinanceRequestException
 from queue import Queue
 
 
 class DataProvider():
 
-	def __init__(self, client, events_queue: Queue, symbol_list: list, timeframe: str):
-		self.client = client
+	def __init__(self, connect:PlatformConnector, events_queue: Queue, symbol_list: list, timeframe: str):
+		self.client = connect.client
 		self.events_queue = events_queue  # recibe una cola de eventos
 		self.symbols: list = symbol_list
 		self.timeframe: str = timeframe
@@ -177,19 +178,6 @@ class DataProvider():
 		else:
 			return tick
 	
-
-	def get_bid_ask(self, symbol: str) -> dict:
-
-		try:
-			order_book = self.client.get_order_book(symbol=symbol)
-			bid = order_book['bids'][0][0] if order_book['bids'] else None
-			ask = order_book['asks'][0][0] if order_book['asks'] else None
-
-			return {"bid": bid, "ask": ask}
-		except Exception as e:
-			print(f"Error al obtener bid y ask: {e}")
-			return None
-
 
 	def check_for_new_data(self) -> None:
 

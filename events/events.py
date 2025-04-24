@@ -8,10 +8,6 @@ import pandas as pd
 class EventType(str, Enum): # hereda de str y Enum
     DATA = "DATA"
     SIGNAL = "SIGNAL"
-    SIZING = "SIZING"
-    ORDER = "ORDER"
-    EXECUTION = "EXECUTION"
-    PENDING = "PENDING"
 
 
 class SignalType(str, Enum): 
@@ -45,50 +41,3 @@ class SignalEvent(BaseEvent):
     target_order: OrderType
     target_price: float
     order_id: int
-    sl: float # stop loss
-    tp: float # tipe profit
-
-
-class SizingEvent(BaseEvent):
-    event_type: EventType = EventType.SIZING
-    symbol: str
-    signal: SignalType
-    target_order: OrderType
-    target_price: float
-    order_id: int
-    sl: float # stop loss
-    tp: float # tipe profit
-    volume: float
-
-
-class OrderEvent(BaseEvent):
-    event_type: EventType = EventType.ORDER
-    symbol: str
-    signal: SignalType
-    target_order: OrderType
-    target_price: float
-    order_id: int
-    sl: float # stop loss
-    tp: float # tipe profit
-    volume: float
-
-
-class PlacePendingOrderEvent(BaseEvent):
-    event_type: EventType = EventType.PENDING
-    symbol: str
-    signal: SignalType
-    target_order: OrderType
-    target_price: float
-    order_id: int
-    sl: float # stop loss
-    tp: float # tipe profit
-    volume: float
-
-
-class ExecutionEvent(BaseEvent):
-    event_type: EventType = EventType.EXECUTION
-    symbol: str
-    signal: SignalType
-    fill_price: float
-    fill_time: datetime
-    volume: float

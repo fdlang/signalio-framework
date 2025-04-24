@@ -1,9 +1,6 @@
 from data_provider.data_provider import DataProvider
 from signal_generator.interfaces.signal_generator_interface import ISignalGererator
-from position_sizer.position_sizer import PositionSizer
-from risk_manager.risk_manager import RiskManager
-from events.events import DataEvent, SignalEvent, SizingEvent, OrderEvent, ExecutionEvent, PlacePendingOrderEvent
-from order_executor.spot_order_executor import SpotOrderExecutor
+from events.events import DataEvent, SignalEvent
 from notifications.notification import NotificationService
 
 from typing import Dict, Callable
@@ -13,17 +10,14 @@ import queue, time
 
 class TradingDirector():
 
-    def __init__(self, events_queue: queue.Queue, data: DataProvider, signal_generator: ISignalGererator, position_sizer: PositionSizer, 
-                 risk_manager: RiskManager, order_execute: SpotOrderExecutor, notification_service: NotificationService):
+    def __init__(self, events_queue: queue.Queue, data: DataProvider, signal_generator: ISignalGererator, 
+                 notification_service: NotificationService):
 
         self.events_queue = events_queue
 
         # referencia de los distintos módulos
         self.DATA = data
         self.SIGNAL_GENERATOR = signal_generator
-        self.POSITION_SIZER = position_sizer
-        self.RISK_MANAGER = risk_manager
-        self.ORDER_EXECUTE = order_execute
         self.NOTIFICATIONS = notification_service
 
         # controlador de trading
@@ -33,10 +27,6 @@ class TradingDirector():
         self.event_handler:Dict[str, Callable] = {
             "DATA": self._handle_data_event, 
             "SIGNAL": self._handle_signal_event,
-            "SIZING": self._handle_sizing_event,
-            "ORDER": self._handle_order_event,
-            "EXECUTION": self._handle_execution_event,
-            "PENDING": self._handle_pending_event
         }
 
 
@@ -46,46 +36,21 @@ class TradingDirector():
 
     def _handle_signal_event(self, event: SignalEvent):
         print(f"{self._dateprint()} - Recibido SIGNAL EVENT de {event.signal} para {event.symbol}")
-        self.POSITION_SIZER.size_signal(event)
         self._process_execution_or_pending_events(event)
 
 
     def _handle_data_event(self, event:DataEvent):
         print(f"{self._dateprint()} - Recibido DATA EVENT de {event.symbol} - Último precio de cierre {event.data.Close}")
         self.SIGNAL_GENERATOR.generate_signal(event)
-    
-
-    def _handle_sizing_event(self, event: SizingEvent):
-        print(f"{self._dateprint()} - Recibido SIZING EVENT con volumen {event.volume}  para {event.signal} en {event.symbol}")
-        self.RISK_MANAGER.assess_order(event)
 
     
-    def _handle_order_event(self, event: OrderEvent):
-        print(f"{self._dateprint()} - Recibido ORDER EVENT con volumen {event.volume}  para {event.signal} en {event.symbol}")
-        # self.ORDER_EXECUTE.excute_order(event) 
-        ########################################
-
-
-    def _handle_execution_event(self, event: ExecutionEvent):
-        print(f"{self._dateprint()} - Recibido EXECUTION ORDER EVENT {event.signal} en {event.symbol} con volumen {event.volume} al precio {event.fill_price}")
-        self._process_execution_or_pending_events(event)
-
-
-    def _handle_pending_event(self, event: PlacePendingOrderEvent):
-        print(f"{self._dateprint()} - Recibido PLACED PENDING EVENT con volumen {event.volume} para {event.signal} {event.target_order} en {event.symbol} al precio {event.target_price}")
-        self._process_execution_or_pending_events(event)
-
-    
-    def _process_execution_or_pending_events(self, event: ExecutionEvent | PlacePendingOrderEvent | SizingEvent):
+    def _process_execution_or_pending_events(self, event: SignalEvent | DataEvent) -> None:
         # aquí se puede colocar codigo para generar mensajes de telegram o lo que se necesite. 
         
         if isinstance(event, SignalEvent):
             self.NOTIFICATIONS.send_notification(tittle=f"Señal de trading", 
                                                  message=f"Recibida señal de {event.signal} para {event.symbol} de tipo {event.signal} al precio {event.target_price}")
         
-        if isinstance(event, ExecutionEvent):
-            self.NOTIFICATIONS.send_notification(tittle=f"Execution Event {event.fill_time}", 
-                                                 message=f"Se ha ejecutado una orden de {event.event_type} para {event.symbol} de tipo {event.signal} al precio {event.fill_price} con un volumen de {event.volume}")
 
 
     def execute(self) -> None:

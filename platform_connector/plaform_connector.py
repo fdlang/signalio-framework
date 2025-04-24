@@ -129,11 +129,11 @@ class PlatformConnector():
 					if symbol_info['status'] != 'TRADING':
 						print(f"El símbolo {symbol} no está en estado 'TRADING'")
 					else:
-						print(f"El símbolo {symbol} se encuentra en el MarketWatch!")
-					break  # Salimos del bucle una vez que encontramos el símbolo
+						print(f"El símbolo {symbol} se encuentra en el Market!")
+					break  
 
 			if not found:
-				print(f"El símbolo {symbol} no existe en el MarketWatch.")
+				print(f"El símbolo {symbol} no existe en el Market.")
 
 
 	def _account_balance(self, balance:dict):
