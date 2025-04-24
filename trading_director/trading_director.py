@@ -70,7 +70,7 @@ class TradingDirector():
 
             else:
                 if event is not None:
-                    handler = self.event_handler.get(event.event_type, self._hanmdle_unknown_event)
+                    handler = self.event_handler.get(event.event_type, self._handle_unknown_event)
                     handler(event)
                 else:
                     self._handle_none_event(event)
