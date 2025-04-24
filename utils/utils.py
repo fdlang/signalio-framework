@@ -1,4 +1,6 @@
 from binance.client import Client
+from datetime import datetime, timezone
+
 
 # Método estatico para poder convertir una divisa a otra
 
@@ -75,3 +77,8 @@ class Utils():
         except Exception as e:
             print(f"No se pudo obtener el precio de {asset} en USDT. Exception: {e}")
             return 0.0
+        
+    
+    @staticmethod
+    def dateprint() -> str: 
+        return datetime.now().strftime("%d/%m/%Y %H:%M:%S.%f")  # format: 12/10/2024 20:30:234

@@ -29,7 +29,7 @@ if __name__ == "__main__":
                             symbol_list=symbols, 
                             timeframe=timeframe)
         
-        
+         
         SIGNAL_GENERATOR = SignalMACrossover(event_queue=events_queue, 
                                             data=DATA_PROVIDER, 
                                             timeframe=timeframe, 

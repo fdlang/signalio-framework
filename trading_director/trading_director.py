@@ -4,7 +4,7 @@ from events.events import DataEvent, SignalEvent
 from notifications.notification import NotificationService
 
 from typing import Dict, Callable
-from datetime import datetime
+from utils.utils import Utils
 import queue, time
 
 
@@ -30,17 +30,14 @@ class TradingDirector():
         }
 
 
-    def _dateprint(self) -> str: 
-        return datetime.now().strftime("%d/%m/%Y %H:%M:%S.%f") # format: 12/10/2024 20:30:234
-
 
     def _handle_signal_event(self, event: SignalEvent):
-        print(f"{self._dateprint()} - Recibido SIGNAL EVENT de {event.signal} para {event.symbol}")
+        print(f"{Utils.dateprint()} - Recibido SIGNAL EVENT de {event.signal} para {event.symbol}")
         self._process_execution_or_pending_events(event)
 
 
     def _handle_data_event(self, event:DataEvent):
-        print(f"{self._dateprint()} - Recibido DATA EVENT de {event.symbol} - Último precio de cierre {event.data.Close}")
+        print(f"{Utils.dateprint()} - Recibido DATA EVENT de {event.symbol} - Último precio de cierre {event.data.Close}")
         self.SIGNAL_GENERATOR.generate_signal(event)
 
     
@@ -49,7 +46,7 @@ class TradingDirector():
         
         if isinstance(event, SignalEvent):
             self.NOTIFICATIONS.send_notification(tittle=f"Señal de trading", 
-                                                 message=f"Señal de {event.signal.value} para {event.symbol} - Precio objetivo: {event.target_price} $ - ID de orden: {event.order_id}")  
+                                                 message=f"Posible señal de {event.signal.value} para {event.symbol} - Precio objetivo: {event.target_price} $ - ID de orden: {event.order_id}")  
         
 
     def execute(self) -> None:
