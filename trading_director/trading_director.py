@@ -49,9 +49,8 @@ class TradingDirector():
         
         if isinstance(event, SignalEvent):
             self.NOTIFICATIONS.send_notification(tittle=f"Señal de trading", 
-                                                 message=f"Recibida señal de {event.signal} para {event.symbol} de tipo {event.signal} al precio {event.target_price}")
+                                                 message=f"Señal de {event.signal.value} para {event.symbol} - Precio objetivo: {event.target_price} $ - ID de orden: {event.order_id}")  
         
-
 
     def execute(self) -> None:
 

@@ -36,7 +36,7 @@ class SignalMACrossover(ISignalGererator):
 
 	def generate_signal(self, data_event:DataEvent) -> None:
 		
-		symbol = data_event.symbol
+		symbol = data_event.symbol 
 
 		# Recupera datos para calcular las medias móviles
 		bars = self.DATA.get_latest_closed_bars(symbol=symbol, timeframe=self.timeframe, num_bars=self.slow_period)
@@ -51,6 +51,7 @@ class SignalMACrossover(ISignalGererator):
 
 			# Detecta una señal de compra
 			if fast_ma > slow_ma:
+				
 				self._create_and_put_signal_event(
 					symbol=symbol,
 					signal="BUY",
@@ -66,7 +67,7 @@ class SignalMACrossover(ISignalGererator):
 					signal="SELL",
 					target_order="MARKET",
 					target_price=float(bars['Close'].iloc[-1]),
-					order_id=1, # Se debe cambiar por un id único para cada orden, ########## QUEDA PENDIENTE!!! ##########
+					order_id=2, # Se debe cambiar por un id único para cada orden, ########## QUEDA PENDIENTE!!! ##########
 				)
 			else:
 				# No hay señal de compra o venta
