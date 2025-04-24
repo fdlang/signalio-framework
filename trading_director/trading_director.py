@@ -49,6 +49,17 @@ class TradingDirector():
                                                  message=f"Posible señal de {event.signal.value} para {event.symbol} - Precio objetivo: {event.target_price} $ - ID de orden: {event.order_id}")  
         
 
+    def _handle_none_event(self, event):
+        print(f"{Utils.dateprint()} - ERROR: Recibido evento nulo. Terminando ejecución del Framework")
+        self.continue_trading = False
+
+
+    def _handle_unknown_event(self, event):
+        
+        print(f"{Utils.dateprint()} - ERROR: Evento desconocido. Terminando ejecución del Framework. - Evento: {event}")
+        self.continue_trading = False
+
+
     def execute(self) -> None:
 
         while self.continue_trading:
@@ -59,12 +70,11 @@ class TradingDirector():
 
             else:
                 if event is not None:
-                    handler = self.event_handler.get(event.event_type)
+                    handler = self.event_handler.get(event.event_type, self._hanmdle_unknown_event)
                     handler(event)
                 else:
-                    self.continue_trading = False
-                    print(f"ERROR: Recibido evento nulo. Terminando ejecución del Framework")
-            
+                    self._handle_none_event(event)
+                    
             time.sleep(0.01)
         
         print("FIN")
