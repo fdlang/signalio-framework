@@ -1,40 +1,36 @@
 from ..interfaces.signal_generator_interface import ISignalGererator
 from data_provider.data_provider import DataProvider
 from events.events import DataEvent, SignalEvent
+from ..properties.signal_generator_properties import RSIProperties
 
 import pandas as pd
 import numpy as np
-from queue import Queue
 
 
-
-class SignalMACrossover(ISignalGererator):
+class SignalRSI(ISignalGererator):
 	
 	
-	def __init__(self, event_queue: Queue, data: DataProvider, timeframe: str, rsi_period: int, rsi_upper: float, rsi_lower: float):
+	def __init__(self, properties: RSIProperties):
 
-		self.event_queue = event_queue
-		self.DATA = data
-
-		self.timeframe = timeframe
-		self.rsi_period = rsi_period if rsi_period > 2 else 2 # El periodo debe ser mayor a 2 para evitar errores en el cálculo del RSI
-		self.rsi_upper = rsi_upper if rsi_upper < 100 else 100 # El límite superior del RSI no puede ser mayor a 100
+		self.timeframe = properties.timeframe
+		self.rsi_period = properties.rsi_period if properties.rsi_period > 2 else 2 # El periodo debe ser mayor a 2 para evitar errores en el cálculo del RSI
+		self.rsi_upper = properties.rsi_upper if properties.rsi_upper < 100 else 100 # El límite superior del RSI no puede ser mayor a 100
 		
-		if rsi_upper > 100 or rsi_upper < 0:
+		if properties.rsi_upper > 100 or properties.rsi_upper < 0:
 			self.rsi_upper = 70 
 		else:
-			self.rsi_upper = rsi_upper
+			self.rsi_upper = properties.rsi_upper
 
-		if rsi_lower > 100 or rsi_lower < 0:
+		if properties.rsi_lower > 100 or properties.rsi_lower < 0:
 			self.rsi_lower = 30 
 		else:
-			self.rsi_lower = rsi_lower
+			self.rsi_lower = properties.rsi_lower
 
 		if self.rsi_lower >= self.rsi_upper:
 			raise Exception(f"ERROR: El límite inferior del RSI ({self.rsi_lower}) no puede ser mayor o igual al límite superior ({self.rsi_upper}).")
 
 
-	def compute_rsi(self, prices: pd.series) -> float:
+	def compute_rsi(self, prices: pd.Series) -> float:
 
 		deltas = np.diff(prices)
 		gains = np.where(deltas > 0, deltas, 0)
@@ -50,56 +46,45 @@ class SignalMACrossover(ISignalGererator):
 		return rsi
 
 
-	def _create_and_put_signal_event(self, symbol: str, signal: str, target_order: str, target_price: float, order_id: int) -> None:
-		
-		signal_event = SignalEvent(
-				symbol=symbol,
-				signal=signal,
-				target_order=target_order,
-				target_price=target_price,
-				order_id=order_id,
-			)
-
-		# Pone el signal_event en la cola de eventos
-		self.event_queue.put(signal_event)
-
-
-	def generate_signal(self, data_event:DataEvent) -> None:
+	def generate_signal(self, data_event:DataEvent, data_provider: DataProvider) -> SignalEvent | None:
 		
 		symbol = data_event.symbol 
 
-		# Recupera datos para calcular las medias móviles
-		bars = self.DATA.get_latest_closed_bars(symbol=symbol, timeframe=self.timeframe, num_bars=self.slow_period)
+		# Recupera los datos necesarios para el cálculo del RSI		
+		bars = data_provider.get_latest_closed_bars(symbol=symbol, timeframe=self.timeframe, num_bars=self.rsi_period + 1)
+
+		# Calcula el RSI de las últimas velas
+		rsi = self.compute_rsi(bars['Close'].astype('float'))
 
 
 		if bars is not None and 'Close' in bars.columns and not bars.empty:
-			bars['Close'] = bars['Close'].astype(float)
 
-			# Calcula el valor de los indicadores
-			fast_ma = bars['Close'][-self.fast_period:].mean()
-			slow_ma = bars['Close'].mean()
-
-			# Detecta una señal de compra
-			if fast_ma > slow_ma:
-				
-				self._create_and_put_signal_event(
+			# señal de compra
+			if rsi < self.rsi_lower:
+				signal_event = SignalEvent(
 					symbol=symbol,
 					signal="BUY",
 					target_order="MARKET",
 					target_price=float(bars['Close'].iloc[-1]),
-					order_id=1, # Se debe cambiar por un id único para cada orden, ########## QUEDA PENDIENTE!!! ##########
+					order_id=1,
 				)
 
+				return signal_event
+
 			# señal de venta
-			elif slow_ma > fast_ma: 
-				self._create_and_put_signal_event(
+			elif rsi > self.rsi_upper: 
+				signal_event = SignalEvent(
 					symbol=symbol,
 					signal="SELL",
 					target_order="MARKET",
 					target_price=float(bars['Close'].iloc[-1]),
-					order_id=2, # Se debe cambiar por un id único para cada orden, ########## QUEDA PENDIENTE!!! ##########
+					order_id=2,
 				)
+
+				return signal_event
 			else:
 				# No hay señal de compra o venta
-				pass
+				return None
+
+
 		
