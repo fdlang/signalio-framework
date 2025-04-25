@@ -1,7 +1,8 @@
 
 from data_provider.data_provider import DataProvider
 from trading_director.trading_director import TradingDirector
-from signal_generator.signals.signal_ma_crossover import SignalMACrossover
+from signal_generator.signal_generator import SignalGenerator
+from signal_generator.properties.signal_generator_properties import MACrossoverProperties, RSIProperties
 from platform_connector.plaform_connector import PlatformConnector
 from notifications.notification import NotificationService, TelegramNotificationProperties
 
@@ -18,6 +19,11 @@ if __name__ == "__main__":
         slow_ma_perid = 50
         fast_ma_perid = 14
 
+        macrossover_properties = MACrossoverProperties(timeframe=timeframe, 
+                                                fast_period=fast_ma_perid, 
+                                                slow_period=slow_ma_perid)
+        
+
         # creación de la cola de eventos principal
         events_queue = Queue()
 
@@ -30,22 +36,20 @@ if __name__ == "__main__":
                             timeframe=timeframe)
         
          
-        SIGNAL_GENERATOR = SignalMACrossover(event_queue=events_queue, 
-                                            data=DATA_PROVIDER, 
-                                            timeframe=timeframe, 
-                                            fast_period=fast_ma_perid, 
-                                            slow_period=slow_ma_perid)
+        SIGNAL_GENERATOR = SignalGenerator(event_queue=events_queue,
+                                            data_provider=DATA_PROVIDER,
+                                            signal_properties=macrossover_properties)
         
         NOTIFICATIONS = NotificationService(
             properties=TelegramNotificationProperties(token=os.getenv('token'),
-                                                      chat_id=os.getenv('canal_id')),)
+                                                       chat_id=os.getenv('canal_id')),)
         
         
         # Crea el trading director y ejecuta el metodo principal
         TRADING_DIRECTOR = TradingDirector(events_queue=events_queue, 
-                                           data=DATA_PROVIDER, 
-                                           signal_generator=SIGNAL_GENERATOR, 
-                                           notification_service=NOTIFICATIONS)
+                                            data=DATA_PROVIDER, 
+                                            signal_generator=SIGNAL_GENERATOR, 
+                                            notification_service=NOTIFICATIONS)
         
         TRADING_DIRECTOR.execute()
 
