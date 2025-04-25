@@ -38,7 +38,7 @@ if __name__ == "__main__":
         
         NOTIFICATIONS = NotificationService(
             properties=TelegramNotificationProperties(token=os.getenv('token'),
-                                                      chat_id=os.getenv('chat_id')))
+                                                      chat_id=os.getenv('canal_id')),)
         
         
         # Crea el trading director y ejecuta el metodo principal
