@@ -13,8 +13,8 @@ import os
 if __name__ == "__main__":
 
     try:
-        symbols = ['BTCUSDC']
-        timeframe = "4h"
+        symbols = ['BTCUSDC', 'SOLUSDC', 'ETHUSDC', 'ADAUSDC', 'FETUSDC']
+        timeframe = "1h"
         new_order_id = 12345
         slow_ma_perid = 50
         fast_ma_perid = 14
