@@ -65,7 +65,7 @@ class SignalRSI(ISignalGererator):
 					signal="BUY",
 					target_order="MARKET",
 					target_price=float(bars['Close'].iloc[-1]),
-					order_id=1,
+					ref="RSI",
 					rsi=rsi,
 				)
 
@@ -78,7 +78,7 @@ class SignalRSI(ISignalGererator):
 					signal="SELL",
 					target_order="MARKET",
 					target_price=float(bars['Close'].iloc[-1]),
-					order_id=2,
+					ref="RSI",
 					rsi=rsi,
 				)
 
