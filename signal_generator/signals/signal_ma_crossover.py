@@ -40,7 +40,7 @@ class SignalMACrossover(ISignalGererator):
 					signal="BUY",
 					target_order="MARKET",
 					target_price=float(bars['Close'].iloc[-1]),
-					ref="Cruce de medias",
+					ref="MA Crossover",
 					rsi=None,
 				)
 				return signal_event
@@ -52,7 +52,7 @@ class SignalMACrossover(ISignalGererator):
 					signal="SELL",
 					target_order="MARKET",
 					target_price=float(bars['Close'].iloc[-1]),
-					ref="Cruce de medias",
+					ref="MA Crossover",
 					rsi=None,
 				)
 				return signal_event
