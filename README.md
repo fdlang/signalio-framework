@@ -1,8 +1,8 @@
-# SignalIO Framework
+# Signalio Framework
 
 > **Framework modular de trading algorítmico para el procesamiento y distribución de señales en tiempo real.**
 
-SignalIO Framework es un sistema extensible diseñado para conectar con exchanges de criptomonedas (actualmente Binance), procesar datos de mercado, generar señales de trading y enviarlas automáticamente mediante un bot de Telegram.
+Signalio Framework es un sistema extensible diseñado para conectar con exchanges de criptomonedas (actualmente Binance), procesar datos de mercado, generar señales de trading y enviarlas automáticamente mediante un bot de Telegram.
 
 ---
 
