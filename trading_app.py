@@ -13,8 +13,8 @@ import os
 if __name__ == "__main__":
 
     try:
-        symbols = ['BTCUSDC', 'SOLUSDC', 'ETHUSDC', 'ADAUSDC', 'FETUSDC']
-        timeframe = "1h"
+        symbols = ['SOLUSDC','BTCUSDC','ETHUSDC']
+        timeframe = "1m"
         new_order_id = 12345
         slow_ma_perid = 50
         fast_ma_perid = 14
@@ -25,8 +25,8 @@ if __name__ == "__main__":
         
         rsi_properties = RSIProperties(timeframe=timeframe,
                                         rsi_period=14,
-                                        rsi_upper=10,
-                                        rsi_lower=5)
+                                        rsi_upper=70,
+                                        rsi_lower=30)
                                         
 
         # creación de la cola de eventos principal
