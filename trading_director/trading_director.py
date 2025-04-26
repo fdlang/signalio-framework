@@ -46,7 +46,8 @@ class TradingDirector():
         
         if isinstance(event, SignalEvent):
             self.NOTIFICATIONS.send_notification(tittle=f"Señal de trading", 
-                                                 message=f"Posible señal de {event.signal.value} para {event.symbol} - precio de entrada {event.target_price}")  
+                                                 message=f"Posible señal de {event.signal.value} para {event.symbol} - precio de entrada {event.target_price}"
+                                                f"{f' - RSI {round(event.rsi)}' if hasattr(event, 'rsi') and event.rsi is not None else ''}")
         
 
     def _handle_none_event(self, event):

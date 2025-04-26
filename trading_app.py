@@ -25,11 +25,10 @@ if __name__ == "__main__":
         
         rsi_properties = RSIProperties(timeframe=timeframe,
                                         rsi_period=14,
-                                        rsi_upper=70,
-                                        rsi_lower=30)
+                                        rsi_upper=10,
+                                        rsi_lower=5)
                                         
-        
-        
+
         # creación de la cola de eventos principal
         events_queue = Queue()
 
@@ -43,7 +42,7 @@ if __name__ == "__main__":
         
         SIGNAL_GENERATOR = SignalGenerator(event_queue=events_queue,
                                             data_provider=DATA_PROVIDER,
-                                            signal_properties=rsi_properties)
+                                            signal_properties=macrossover_properties)
         
         NOTIFICATIONS = NotificationService(
             properties=TelegramNotificationProperties(token=os.getenv('token'),

@@ -41,6 +41,7 @@ class SignalMACrossover(ISignalGererator):
 					target_order="MARKET",
 					target_price=float(bars['Close'].iloc[-1]),
 					order_id=1,
+					rsi=None,
 				)
 				return signal_event
 
@@ -52,6 +53,7 @@ class SignalMACrossover(ISignalGererator):
 					target_order="MARKET",
 					target_price=float(bars['Close'].iloc[-1]),
 					order_id=2,
+					rsi=None,
 				)
 				return signal_event
 			else:
