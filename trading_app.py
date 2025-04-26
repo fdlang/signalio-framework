@@ -23,7 +23,13 @@ if __name__ == "__main__":
                                                 fast_period=fast_ma_perid, 
                                                 slow_period=slow_ma_perid)
         
-
+        rsi_properties = RSIProperties(timeframe=timeframe,
+                                        rsi_period=14,
+                                        rsi_upper=70,
+                                        rsi_lower=30)
+                                        
+        
+        
         # creación de la cola de eventos principal
         events_queue = Queue()
 
@@ -35,15 +41,13 @@ if __name__ == "__main__":
                             symbol_list=symbols, 
                             timeframe=timeframe)
         
-         
         SIGNAL_GENERATOR = SignalGenerator(event_queue=events_queue,
                                             data_provider=DATA_PROVIDER,
-                                            signal_properties=macrossover_properties)
+                                            signal_properties=rsi_properties)
         
         NOTIFICATIONS = NotificationService(
             properties=TelegramNotificationProperties(token=os.getenv('token'),
                                                        chat_id=os.getenv('canal_id')),)
-        
         
         # Crea el trading director y ejecuta el metodo principal
         TRADING_DIRECTOR = TradingDirector(events_queue=events_queue, 

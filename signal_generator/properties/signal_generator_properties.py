@@ -12,6 +12,6 @@ class MACrossoverProperties(BaseSignalProps):
 class RSIProperties(BaseSignalProps):
 	
 	timeframe: str
-	rsi_period: float
+	rsi_period: int
 	rsi_upper: float
 	rsi_lower: float
