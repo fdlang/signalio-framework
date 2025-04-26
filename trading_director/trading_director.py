@@ -4,7 +4,8 @@ from events.events import DataEvent, SignalEvent
 from notifications.notification import NotificationService
 
 from typing import Dict, Callable
-from utils.utils import Utils
+from utils.utils import Utils 
+from utils.format_text import Format_Text
 import queue, time
 
 
@@ -45,9 +46,9 @@ class TradingDirector():
         # aquí se puede colocar codigo para generar mensajes de telegram o lo que se necesite. 
         
         if isinstance(event, SignalEvent):
-            self.NOTIFICATIONS.send_notification(tittle=f"Señal de trading detectada: {event.ref}.", 
-                                                 message=f"\nPosible señal de {event.signal.value} para {event.symbol} - precio de entrada {event.target_price}"
-                                                f"{f' - RSI {round(event.rsi)}' if hasattr(event, 'rsi') and event.rsi is not None else ''}")
+            tittle, message = Format_Text.get_format_text_emoji(event)
+            
+            self.NOTIFICATIONS.send_notification(tittle=tittle, message=message)
         
 
     def _handle_none_event(self, event):

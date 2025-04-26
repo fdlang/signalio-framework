@@ -13,7 +13,7 @@ import os
 if __name__ == "__main__":
 
     try:
-        symbols = ['BTCUSDC', 'SOLUSDC', 'ETHUSDC', 'ADAUSDC']
+        symbols = ['BTCUSDC']
         timeframe = "4h"
         new_order_id = 12345
         slow_ma_perid = 50
@@ -42,7 +42,7 @@ if __name__ == "__main__":
         
         SIGNAL_GENERATOR = SignalGenerator(event_queue=events_queue,
                                             data_provider=DATA_PROVIDER,
-                                            signal_properties=macrossover_properties)
+                                            signal_properties=rsi_properties)
         
         NOTIFICATIONS = NotificationService(
             properties=TelegramNotificationProperties(token=os.getenv('token'),

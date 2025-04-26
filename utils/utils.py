@@ -82,3 +82,4 @@ class Utils():
     @staticmethod
     def dateprint() -> str: 
         return datetime.now().strftime("%d/%m/%Y %H:%M:%S.%f")  # format: 12/10/2024 20:30:234
+    
