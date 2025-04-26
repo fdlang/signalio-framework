@@ -32,14 +32,7 @@ Signalio Framework es un sistema extensible diseñado para conectar con exchange
 
 ## Arquitectura
 
-```mermaid
-flowchart TD
-    A[PlatformConnector] --> B[DataProvider]
-    B --> C[SignalGenerator]
-    C --> D[Notifier]
-    C --> E[Usuario de Telegram]
-    D --> F[(próximamente)<br/>Ejecución de órdenes en Exchange]
-```
+
 
 ### Componentes principales
 
@@ -62,14 +55,14 @@ flowchart TD
 
 ### Clonar el proyecto
 
-```bash
-git clone https://github.com/fdlang/signalio-framework.git
-cd signalio-framework
+```python
+git clone https://github.com/fdlang/Signalio-framework.git
+cd Signalio-framework
 ```
 
 ### Instalar dependencias
 
-```bash
+```python
 pip install -r requirements.txt
 ```
 
@@ -77,7 +70,7 @@ pip install -r requirements.txt
 
 ## Configuración
 
-SignalIO utiliza variables de entorno para las credenciales y configuraciones básicas:
+Signalio utiliza variables de entorno para las credenciales y configuraciones básicas:
 
 | Variable               | Descripción                         |
 |-------------------------|-------------------------------------|
@@ -88,16 +81,16 @@ SignalIO utiliza variables de entorno para las credenciales y configuraciones b�
 
 **Ejemplo**:
 
-```bash
-export BINANCE_API_KEY='your_api_key'
-export BINANCE_API_SECRET='your_api_secret'
-export TELEGRAM_BOT_TOKEN='your_bot_token'
-export TELEGRAM_CHAT_ID='your_chat_id'
+```python
+BINANCE_API_KEY='your_api_key'
+BINANCE_API_SECRET='your_api_secret'
+TELEGRAM_BOT_TOKEN='your_bot_token'
+TELEGRAM_CHAT_ID='your_chat_id'
 ```
 
 O puedes crear un archivo `.env`:
 
-```bash
+```python
 BINANCE_API_KEY=your_api_key
 BINANCE_API_SECRET=your_api_secret
 TELEGRAM_BOT_TOKEN=your_bot_token
@@ -110,7 +103,7 @@ TELEGRAM_CHAT_ID=your_chat_id
 
 ### Ejecución local
 
-```bash
+```python
 python trading_app.py
 ```
 
@@ -121,9 +114,9 @@ Esto lanzará:
 
 ### Uso con Docker
 
-```bash
-docker build -t signalio-framework .
-docker run --env-file .env signalio-framework
+```python
+docker build -t Signalio-framework .
+docker run --env-file .env Signalio-framework
 ```
 
 ---
