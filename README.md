@@ -15,7 +15,6 @@ Signalio Framework es un sistema extensible diseñado para conectar con exchange
 - [Uso](#uso)
 - [Roadmap](#roadmap)
 - [Contribuciones](#contribuciones)
-- [Licencia](#licencia)
 
 ---
 
