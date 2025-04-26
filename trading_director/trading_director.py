@@ -76,6 +76,6 @@ class TradingDirector():
                 else:
                     self._handle_none_event(event)
                     
-            time.sleep(0.01)
+            time.sleep(0.2) # Tiempo de carga para evitar el uso excesivo de CPU (0.2 = 5 veces por segundo)
         
         print("FIN")
