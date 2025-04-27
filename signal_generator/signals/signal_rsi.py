@@ -31,21 +31,30 @@ class SignalRSI(ISignalGererator):
 
 
 	def compute_rsi(self, prices: pd.Series) -> float:
-
-		deltas = np.diff(prices)
-		gains = np.where(deltas > 0, deltas, 0)
-		losses = np.where(deltas < 0, -deltas, 0) # Convertimos las pérdidas a valores positivos
 		
-		average_gain = np.mean(gains[-self.rsi_period:])
-		average_loss = np.mean(losses[-self.rsi_period:])
+		prices_array = prices.to_numpy()
+		deltas = np.diff(prices_array)
 
-		# Aplicamos la formula RSI: rsi = 100 - (100 / (1 + (average_gain / average_loss)))
-		rs = average_gain / average_loss if average_loss > 0 else 0
-		rsi = 100 - (100 / (1 + rs))
+		gains = np.where(deltas > 0, deltas, 0)
+		losses = np.where(deltas < 0, -deltas, 0)
+
+		avg_gain = np.mean(gains[:self.rsi_period])
+		avg_loss = np.mean(losses[:self.rsi_period])
+
+		# Suavizado exponencial (tipo Wilder) sobre los siguientes valores
+		for i in range(self.rsi_period, len(gains)):
+			avg_gain = (avg_gain * (self.rsi_period - 1) + gains[i]) / self.rsi_period
+			avg_loss = (avg_loss * (self.rsi_period - 1) + losses[i]) / self.rsi_period
+
+		# RSI final basado en el último promedio suavizado
+		if avg_loss == 0:
+			rsi = 100
+		else:
+			rs = avg_gain / avg_loss
+			rsi = 100 - (100 / (1 + rs))
 
 		return rsi
 	
-
 
 	def generate_signal(self, data_event:DataEvent, data_provider: DataProvider) -> SignalEvent | None:
 		
