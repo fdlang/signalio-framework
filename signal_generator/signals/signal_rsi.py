@@ -31,22 +31,22 @@ class SignalRSI(ISignalGererator):
 
 
 	def compute_rsi(self, prices: pd.Series) -> float:
-		
-		prices_array = prices.to_numpy()
-		deltas = np.diff(prices_array)
 
+		deltas = np.diff(prices)
+
+		# Calcula las ganancias y pérdidas
 		gains = np.where(deltas > 0, deltas, 0)
-		losses = np.where(deltas < 0, -deltas, 0)
+		losses = np.where(deltas < 0, -deltas, 0) 
 
-		avg_gain = np.mean(gains[:self.rsi_period])
-		avg_loss = np.mean(losses[:self.rsi_period])
+		# Inicialización del primer promedio
+		avg_gain = np.mean(gains[-self.rsi_period:])
+		avg_loss = np.mean(losses[-self.rsi_period:])
 
-		# Suavizado exponencial (tipo Wilder) sobre los siguientes valores
-		for i in range(self.rsi_period, len(gains)):
+		# Suavizado de los valores de ganancia y pérdida (tipo Wilder)
+		for i in range(self.rsi_period, len(prices)-1):  # Iteramos sobre el resto de las barras
 			avg_gain = (avg_gain * (self.rsi_period - 1) + gains[i]) / self.rsi_period
 			avg_loss = (avg_loss * (self.rsi_period - 1) + losses[i]) / self.rsi_period
 
-		# RSI final basado en el último promedio suavizado
 		if avg_loss == 0:
 			rsi = 100
 		else:
@@ -54,6 +54,7 @@ class SignalRSI(ISignalGererator):
 			rsi = 100 - (100 / (1 + rs))
 
 		return rsi
+
 	
 
 	def generate_signal(self, data_event:DataEvent, data_provider: DataProvider) -> SignalEvent | None:
@@ -69,7 +70,7 @@ class SignalRSI(ISignalGererator):
 		if bars is not None and 'Close' in bars.columns and not bars.empty:
 			
 			# señal de compra
-			if rsi <= 30:
+			if rsi <= 30.0:
 				signal_event = SignalEvent(
 					symbol=symbol,
 					signal="BUY",
@@ -82,7 +83,7 @@ class SignalRSI(ISignalGererator):
 				return signal_event
 
 			# señal de venta
-			elif rsi >= 70: 
+			elif rsi >= 70.0: 
 				signal_event = SignalEvent(
 					symbol=symbol,
 					signal="SELL",
