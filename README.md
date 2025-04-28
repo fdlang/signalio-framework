@@ -3,7 +3,7 @@
 
 Framework modular de trading algorítmico desarrollado en Python, diseñado siguiendo principios SOLID y patrones de diseño como Factory, Observer y Dependency Injection.
 
-El Framework conecta a Binance, procesa datos de mercado en tiempo real y genera señales automáticas enviadas a Telegram.
+El Framework conecta al exchange Binance, procesa datos de mercado en tiempo real y genera señales automáticas enviadas a Telegram.
 Su arquitectura escalable y desacoplada permite la fácil integración de nuevos exchanges, así como la futura ejecución automática de operaciones.
 
 ---
@@ -28,7 +28,7 @@ Su arquitectura escalable y desacoplada permite la fácil integración de nuevos
 
 ## 🏗 Tecnologías utilizadas
 
-- Python 3.10
+- Python 
 - Binance API
 - Telegram Bot API
 - Docker
@@ -40,10 +40,11 @@ Su arquitectura escalable y desacoplada permite la fácil integración de nuevos
 
 Signalio Framework se estructura en módulos independientes que interactúan entre sí:
 
-- `platform`: gestión de conexión a exchanges como Binance.
-- `signal`: generación de señales de compra/venta.
-- `notifier`: envío de señales a Telegram.
-- `core`: núcleo de servicios, configuración y utilidades comunes.
+- `platform_connector`: gestión de conexión a exchanges como Binance.
+- `data_provider`: gestion y tratamiento de datos en tiempo real.
+- `signal_generator`: generación de señales de trading.
+- `notifications`: envío de datos via mensajes a Telegram.
+- `trading_director`: maneja la logica principal del proyecto.
 
 Cada componente es desacoplado, permitiendo fácil extensión y mantenimiento.
 
@@ -56,7 +57,7 @@ Signalio Framework ha sido construido aplicando principios de ingeniería de sof
 ---
 
 ### 📡 Observer
-El módulo `Notifier` implementa el patrón Observer para reaccionar a las señales generadas.  
+El módulo `notifications` implementa el patrón Observer para reaccionar a las señales generadas.  
 Cuando el `SignalGenerator` detecta una oportunidad de mercado, notifica automáticamente a los observadores (como el bot de Telegram), que se encargan de enviar el mensaje al usuario.
 
 > **Ventaja:** Permite añadir múltiples sistemas de notificación (Telegram, correo electrónico, dashboards) sin modificar la lógica de generación de señales.
@@ -64,7 +65,7 @@ Cuando el `SignalGenerator` detecta una oportunidad de mercado, notifica automá
 ---
 
 ### 🛠️ Dependency Injection
-Los componentes principales (`PlatformConnector`, `SignalGenerator`, `Notifier`) reciben sus dependencias externamente en lugar de crearlas internamente, fomentando un bajo acoplamiento y facilitando el testing.
+Los componentes principales (`PlatformConnector`, `SignalGenerator`, `notifications`) reciben sus dependencias externamente en lugar de crearlas internamente, fomentando un bajo acoplamiento y facilitando el testing.
 
 > **Ventaja:** Mejora la testabilidad y permite sustituir o ampliar componentes de forma sencilla.
 
@@ -118,10 +119,17 @@ Gracias a esta arquitectura basada en patrones:
 Crea un archivo `.env` en la raíz del proyecto con las siguientes variables:
 
 ```env
-BINANCE_API_KEY=your_binance_api_key
-BINANCE_API_SECRET=your_binance_api_secret
-TELEGRAM_BOT_TOKEN=your_telegram_bot_token
-TELEGRAM_CHAT_ID=your_telegram_chat_id
+# BINANCE
+api_key=your_binance_api_key
+secret_key=your_binance_api_secret
+
+# BINANCE TESNET
+testnet_api_key=your_binance_testnet_api_key
+testnet_secret_key=your_binance_tesnet_api_secret
+
+# TELEGRAM
+token=your_telegram_bot_token
+chat_id=your_telegram_chat_id
 ```
 
 ---
