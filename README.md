@@ -55,7 +55,7 @@ Signalio Framework ha sido construido aplicando principios de ingeniería de sof
 
 ---
 
-### 📡 Observer Pattern
+### 📡 Observer
 El módulo `Notifier` implementa el patrón Observer para reaccionar a las señales generadas.  
 Cuando el `SignalGenerator` detecta una oportunidad de mercado, notifica automáticamente a los observadores (como el bot de Telegram), que se encargan de enviar el mensaje al usuario.
 
@@ -70,14 +70,14 @@ Los componentes principales (`PlatformConnector`, `SignalGenerator`, `Notifier`)
 
 ---
 
-### 🔌 Adapter Pattern
+### 🔌 Adapter 
 El `PlatformConnector` actúa como adaptador entre la API externa de Binance y la lógica interna del framework, transformando los datos recibidos a un formato estandarizado.
 
 > **Ventaja:** Facilita la integración de nuevos exchanges o fuentes de datos sin modificar la lógica de negocio.
 
 ---
 
-### 🏭 Factory Pattern (En evolución)
+### 🏭 Factory (En evolución)
 La estructura actual de `PlatformConnector` está diseñada para evolucionar hacia un patrón Factory completo, donde se podrá seleccionar dinámicamente la plataforma a conectar (Binance, Coinbase, KuCoin, etc.).
 
 > **Ventaja:** Permite escalar fácilmente a múltiples plataformas mediante un único punto de creación controlado.
