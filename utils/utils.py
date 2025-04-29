@@ -90,9 +90,9 @@ class Utils():
 
 		market = ""
 
-		if event.rsi > 70:
+		if event.rsi != None and event.rsi > 70:
 			market = "(mercado sobre comprado)"
-		elif event.rsi > 30:
+		elif event.rsi != None and event.rsi > 30:
 			market = "(mercado sobre vendido)"
 
 		# Formato título
