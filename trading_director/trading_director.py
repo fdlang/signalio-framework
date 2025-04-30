@@ -45,8 +45,8 @@ class TradingDirector():
         # aquí se puede colocar codigo para generar mensajes de telegram o lo que se necesite. 
         
         if isinstance(event, SignalEvent):
+
             tittle, message = Utils.format_signal_message(event)
-            
             self.NOTIFICATIONS.send_notification(tittle=tittle, message=message)
         
 
@@ -56,13 +56,14 @@ class TradingDirector():
 
 
     def _handle_unknown_event(self, event):
-        
         print(f"{Utils.dateprint()} - ERROR: Evento desconocido. Terminando ejecución del Framework. - Evento: {event}")
         self.continue_trading = False
 
 
     def execute(self) -> None:
-
+        """
+        Método principal del director de trading. Se encarga de recibir los eventos y procesarlos.
+        """
         while self.continue_trading:
             try:
                 event = self.events_queue.get(block=False) # Cola FIFO (el primer evento que entra es el primero en salir)

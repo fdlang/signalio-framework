@@ -19,7 +19,9 @@ class SignalMACrossover(ISignalGererator):
 
 
 	def generate_signal(self, data_event:DataEvent, data_provider: DataProvider) -> SignalEvent | None:
-		
+		'''
+		Genera una señal de compra o venta en función de la media móvil rápida y lenta.
+		'''
 		symbol = data_event.symbol 
 
 		# Recupera datos para calcular las medias móviles

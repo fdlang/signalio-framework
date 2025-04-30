@@ -46,7 +46,10 @@ class DataProvider():
 
 
 	def get_latest_closed_bar(self, symbol: str, timeframe: str) -> pd.Series:
-
+		'''
+		Recupera la última vela cerrada de un símbolo y un intervalo de tiempo especificado.
+		Si no hay velas cerradas, devuelve una serie vacía.
+		'''
 		# Define los paramertros adecuados
 		interval = self._map_timeframes(timeframe) # intervalo de tiempo para las velas 
 		limit = 2 # limite de velas
@@ -106,7 +109,10 @@ class DataProvider():
 
 
 	def get_latest_closed_bars(self, symbol: str, timeframe: str, num_bars: int = 1) -> pd.DataFrame:
-
+		'''
+		Recupera las últimas velas cerradas de un símbolo y un intervalo de tiempo especificado.
+		Si no hay velas cerradas, devuelve un DataFrame vacío.
+		'''
 		# Define los paramertros adecuados
 		interval = self._map_timeframes(timeframe) # intervalo de tiempo para las velas 
 		limit = num_bars if num_bars > 0 else 1
@@ -160,7 +166,10 @@ class DataProvider():
 
 
 	def get_latest_tick(self, symbol: str) -> dict:
-
+		'''
+		Recupera el último tick de un símbolo.
+		Si no hay ticks, devuelve un diccionario vacío.
+		'''
 		try:
 			tick = self.client.get_ticker(symbol=symbol)
 
@@ -180,7 +189,10 @@ class DataProvider():
 	
 
 	def check_for_new_data(self) -> None:
-
+		'''
+		Comprueba si hay datos nuevos para cada símbolo en la lista de símbolos.
+		Si hay datos nuevos, crea un evento de datos y lo añade a la cola de eventos.
+		'''
 		# Compruba si hay datos nuevos
 		for symbol in self.symbols:
 			last_bar = self.get_latest_closed_bar(symbol, self.timeframe)

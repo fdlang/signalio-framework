@@ -31,7 +31,12 @@ class SignalRSI(ISignalGererator):
 
 
 	def compute_rsi(self, prices: pd.Series) -> float:
-
+		'''
+		Calcula el RSI (Relative Strength Index) de una serie de precios.
+		El RSI es un indicador de momentum que mide la velocidad y el cambio de los movimientos de precios.
+		El RSI oscila entre 0 y 100, y se utiliza para identificar condiciones de sobrecompra o sobreventa en un activo.
+		Un RSI por encima de 70 indica que un activo está sobrecomprado, mientras que un RSI por debajo de 30 indica que está sobrevendido.
+		'''
 		deltas = np.diff(prices)
 
 		# Calcula las ganancias y pérdidas
@@ -58,7 +63,9 @@ class SignalRSI(ISignalGererator):
 	
 
 	def generate_signal(self, data_event:DataEvent, data_provider: DataProvider) -> SignalEvent | None:
-		
+		'''
+		Genera una señal de compra o venta en función del RSI.
+		'''
 		symbol = data_event.symbol 
 
 		# Recupera los datos necesarios para el cálculo del RSI		

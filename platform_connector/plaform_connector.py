@@ -151,8 +151,14 @@ class PlatformConnector():
 		return bal_info
 
 
-	def _get_account_balance_usdt(self):
-		# Calcula el saldo total de la billetera en USDT
+	def _get_account_balance_usdt(self) -> float:
+		'''
+		Calcula el valor total de la cuenta en USDT.
+		Itera sobre los balances de la cuenta y suma el valor de cada activo en USDT.
+		Returns:
+			float: Valor total de la cuenta en USDT.
+		'''
+
 		total_usdt_value = 0
 		tickers_list = self.client.get_symbol_ticker()
 		account_info = self.client.get_account()

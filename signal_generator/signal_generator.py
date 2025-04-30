@@ -17,7 +17,7 @@ class SignalGenerator(ISignalGererator):
 
 
 	def _get_signal_generator_method(self, signal_props: BaseSignalProps) -> ISignalGererator:
-	
+		
 		if isinstance(signal_props, MACrossoverProperties):
 			return SignalMACrossover(properties=signal_props)
 		
@@ -29,12 +29,11 @@ class SignalGenerator(ISignalGererator):
 							
 
 	def generate_signal(self, data_event: DataEvent) -> None:
-		
+
 		signal_event = self.signal_generator_method.generate_signal(data_event, self.data_provider)
 
 		if signal_event is not None:
 			self.event_queue.put(signal_event)
-
 	
 
 	def _create_and_put_signal_event(self, signal_event) -> None:
