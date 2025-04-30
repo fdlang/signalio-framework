@@ -1,9 +1,9 @@
 
-# 🚀 Signalio Framework
+# 🚀 Signalio
 
 Framework modular de trading algorítmico desarrollado en Python, diseñado siguiendo principios SOLID y patrones de diseño como Factory, Observer y Dependency Injection.
 
-El Framework conecta al exchange Binance, procesa datos de mercado en tiempo real y genera señales automáticas enviadas a Telegram.
+Signalio Framework conecta al exchange Binance, procesa datos de mercado en tiempo real y genera señales automáticas enviadas a Telegram.
 Su arquitectura escalable y desacoplada permite la fácil integración de nuevos exchanges, así como la futura ejecución automática de operaciones.
 
 ---
@@ -14,10 +14,10 @@ Su arquitectura escalable y desacoplada permite la fácil integración de nuevos
 - [🏗 Tecnologías utilizadas](#-tecnologías-utilizadas)
 - [🧠 Arquitectura del Proyecto](#-arquitectura-del-proyecto)
 - [🎨 Patrones de Diseño Aplicados](#-patrones-de-diseño-aplicados)
-  - [📡 Observer Pattern](#-observer-pattern)
+  - [📡 Observer](#-observer-pattern)
   - [🛠️ Dependency Injection](#-dependency-injection)
-  - [🔌 Adapter Pattern](#-adapter-pattern)
-  - [🏭 Factory Pattern (En evolución)](#-factory-pattern-en-evolución)
+  - [🔌 Adapter](#-adapter-pattern)
+  - [🏭 Factory (En evolución)](#-factory-pattern-en-evolución)
 - [🚀 Beneficios del Diseño](#-beneficios-del-diseño)
 - [📦 Instalación y ejecución](#-instalación-y-ejecución)
 - [⚙️ Configuración](#-configuración)
@@ -29,9 +29,10 @@ Su arquitectura escalable y desacoplada permite la fácil integración de nuevos
 ## 🏗 Tecnologías utilizadas
 
 - Python 
+- Docker
+- Anaconda
 - Binance API
 - Telegram Bot API
-- Docker
 - Arquitectura Modular basada en principios SOLID
 
 ---
@@ -160,6 +161,7 @@ Por favor asegúrate de mantener el estilo de codificación existente y agregar 
 
 ## 📄 Licencia
 
-Este proyecto está licenciado bajo la Licencia MIT.
+Este proyecto está licenciado bajo la Licencia MIT 
+Copyright (c) 2024 Angel Arcos
 
 ---
