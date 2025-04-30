@@ -33,7 +33,7 @@ if __name__ == "__main__":
         events_queue = Queue()
 
         # creación modulos principales del framework
-        CONNECT = PlatformConnector(symbols=symbols)
+        CONNECT = PlatformConnector(symbols=symbols) 
         
         DATA_PROVIDER = DataProvider(CONNECT, 
                             events_queue=events_queue, 
