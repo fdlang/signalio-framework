@@ -5,7 +5,6 @@ from notifications.notification import NotificationService
 
 from typing import Dict, Callable
 from utils.utils import Utils 
-from utils.format_text import Format_Text
 import queue, time
 
 
@@ -46,7 +45,7 @@ class TradingDirector():
         # aquí se puede colocar codigo para generar mensajes de telegram o lo que se necesite. 
         
         if isinstance(event, SignalEvent):
-            tittle, message = Format_Text.get_format_text_emoji(event)
+            tittle, message = Utils.format_signal_message(event)
             
             self.NOTIFICATIONS.send_notification(tittle=tittle, message=message)
         
@@ -77,6 +76,6 @@ class TradingDirector():
                 else:
                     self._handle_none_event(event)
                     
-            time.sleep(1) # Tiempo de carga para evitar el uso excesivo de CPU (0.2 = 5 veces por segundo)
+            time.sleep(0.02) # Tiempo de carga para evitar el uso excesivo de CPU (0.2 = 5 veces por segundo)
         
         print("FIN")

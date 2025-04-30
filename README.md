@@ -1,134 +1,146 @@
-# Signalio Framework
 
-> **Framework modular de trading algorítmico para el procesamiento y distribución de señales en tiempo real.**
+# 🚀 Signalio Framework
 
-Signalio Framework es un sistema extensible diseñado para conectar con exchanges de criptomonedas (actualmente Binance), procesar datos de mercado, generar señales de trading y enviarlas automáticamente mediante un bot de Telegram.
+Framework modular de trading algorítmico desarrollado en Python, diseñado siguiendo principios SOLID y patrones de diseño como Factory, Observer y Dependency Injection.
 
----
-
-## Tabla de contenidos
-
-- [Características](#características)
-- [Arquitectura](#arquitectura)
-- [Instalación](#instalación)
-- [Configuración](#configuración)
-- [Uso](#uso)
-- [Roadmap](#roadmap)
-- [Contribuciones](#contribuciones)
+El Framework conecta al exchange Binance, procesa datos de mercado en tiempo real y genera señales automáticas enviadas a Telegram.
+Su arquitectura escalable y desacoplada permite la fácil integración de nuevos exchanges, así como la futura ejecución automática de operaciones.
 
 ---
 
-## Características
+## 📚 Tabla de Contenidos
 
-- 🔌 **Conexión a Binance** vía API pública/privada.
-- 🧠 **Procesamiento modular** de datos de mercado.
-- 🏗️ **Platform Connector**: capa de abstracción para facilitar soporte multi-exchange.
-- 📈 **Generador de señales** configurable.
-- 📲 **Integración con Telegram** para notificación de señales.
-- 🚀 **Contenerización** lista mediante Docker.
-
----
-
-## Arquitectura
-
-
-
-### Componentes principales
-
-| Componente          | Descripción |
-|----------------------|-------------|
-| **Platform Connector** | Capa de conexión estandarizada para comunicación con exchanges como Binance. |
-| **Data Provider**    | Obtiene datos de mercado (precio, volumen, indicadores). |
-| **Signal Generator** | Procesa los datos y genera señales basadas en estrategias. |
-| **Notifier**         | Envía las señales generadas a un canal de Telegram. |
+- [🚀 SignalIO Framework](#-signalio-framework)
+- [🏗 Tecnologías utilizadas](#-tecnologías-utilizadas)
+- [🧠 Arquitectura del Proyecto](#-arquitectura-del-proyecto)
+- [🎨 Patrones de Diseño Aplicados](#-patrones-de-diseño-aplicados)
+  - [📡 Observer Pattern](#-observer-pattern)
+  - [🛠️ Dependency Injection](#-dependency-injection)
+  - [🔌 Adapter Pattern](#-adapter-pattern)
+  - [🏭 Factory Pattern (En evolución)](#-factory-pattern-en-evolución)
+- [🚀 Beneficios del Diseño](#-beneficios-del-diseño)
+- [📦 Instalación y ejecución](#-instalación-y-ejecución)
+- [⚙️ Configuración](#-configuración)
+- [🛠️ Futuras mejoras](#-futuras-mejoras)
+- [📄 Licencia](#-licencia)
 
 ---
 
-## Instalación
+## 🏗 Tecnologías utilizadas
 
-### Requisitos
+- Python 
+- Binance API
+- Telegram Bot API
+- Docker
+- Arquitectura Modular basada en principios SOLID
 
-- Python 3.7+
-- Cuenta Binance con API habilitada
-- Bot de Telegram activo
+---
 
-### Clonar el proyecto
+## 🧠 Arquitectura del Proyecto
 
-```python
-git clone https://github.com/fdlang/Signalio-framework.git
-cd Signalio-framework
+Signalio Framework se estructura en módulos independientes que interactúan entre sí:
+
+- `platform_connector`: gestión de conexión a exchanges como Binance.
+- `data_provider`: gestion y tratamiento de datos en tiempo real.
+- `signal_generator`: generación de señales de trading.
+- `notifications`: envío de datos via mensajes a Telegram.
+- `trading_director`: maneja la logica principal del proyecto.
+
+Cada componente es desacoplado, permitiendo fácil extensión y mantenimiento.
+
+---
+
+## 🎨 Patrones de Diseño Aplicados
+
+Signalio Framework ha sido construido aplicando principios de ingeniería de software sólidos y utilizando varios patrones de diseño clásicos para garantizar escalabilidad, modularidad y mantenibilidad:
+
+---
+
+### 📡 Observer
+El módulo `notifications` implementa el patrón Observer para reaccionar a las señales generadas.  
+Cuando el `SignalGenerator` detecta una oportunidad de mercado, notifica automáticamente a los observadores (como el bot de Telegram), que se encargan de enviar el mensaje al usuario.
+
+> **Ventaja:** Permite añadir múltiples sistemas de notificación (Telegram, correo electrónico, dashboards) sin modificar la lógica de generación de señales.
+
+---
+
+### 🛠️ Dependency Injection
+Los componentes principales (`PlatformConnector`, `SignalGenerator`, `notifications`) reciben sus dependencias externamente en lugar de crearlas internamente, fomentando un bajo acoplamiento y facilitando el testing.
+
+> **Ventaja:** Mejora la testabilidad y permite sustituir o ampliar componentes de forma sencilla.
+
+---
+
+### 🔌 Adapter 
+El `PlatformConnector` actúa como adaptador entre la API externa de Binance y la lógica interna del framework, transformando los datos recibidos a un formato estandarizado.
+
+> **Ventaja:** Facilita la integración de nuevos exchanges o fuentes de datos sin modificar la lógica de negocio.
+
+---
+
+### 🏭 Factory (En evolución)
+La estructura actual de `PlatformConnector` está diseñada para evolucionar hacia un patrón Factory completo, donde se podrá seleccionar dinámicamente la plataforma a conectar (Binance, Coinbase, KuCoin, etc.).
+
+> **Ventaja:** Permite escalar fácilmente a múltiples plataformas mediante un único punto de creación controlado.
+
+---
+
+## 🚀 Beneficios del Diseño
+
+Gracias a esta arquitectura basada en patrones:
+- Signalio es **extensible** y preparado para múltiples exchanges.
+- Es **mantenible** con bajo acoplamiento entre componentes.
+- Está **optimizado para testeo** y futuras mejoras como la ejecución automática de operaciones.
+
+---
+
+## 📦 Instalación y ejecución
+
+1. Clona el repositorio:
+   ```bash
+   git clone https://github.com/fdlang/Signalio-framework.git
+   ```
+2. Crea un entorno virtual e instala dependencias:
+   ```bash
+   python -m venv env
+   source env/bin/activate
+   pip install -r requirements.txt
+   ```
+3. Configura tus claves API en el archivo `.env`.
+4. Ejecuta el programa:
+   ```bash
+   python trading_app.py
+   ```
+
+---
+
+## ⚙️ Configuración
+
+Crea un archivo `.env` en la raíz del proyecto con las siguientes variables:
+
+```env
+# BINANCE
+api_key=your_binance_api_key
+secret_key=your_binance_api_secret
+
+# BINANCE TESNET
+testnet_api_key=your_binance_testnet_api_key
+testnet_secret_key=your_binance_tesnet_api_secret
+
+# TELEGRAM
+token=your_telegram_bot_token
+chat_id=your_telegram_chat_id
 ```
 
-### Instalar dependencias
-
-```python
-pip install -r requirements.txt
-```
-
 ---
 
-## Configuración
+## 🛠️ Futuras mejoras
 
-Signalio utiliza variables de entorno para las credenciales y configuraciones básicas:
-
-| Variable               | Descripción                         |
-|-------------------------|-------------------------------------|
-| `BINANCE_API_KEY`        | Clave pública de Binance           |
-| `BINANCE_API_SECRET`     | Clave secreta de Binance           |
-| `TELEGRAM_BOT_TOKEN`     | Token de tu bot en Telegram        |
-| `TELEGRAM_CHAT_ID`       | ID del chat o grupo objetivo       |
-
-**Ejemplo**:
-
-```python
-BINANCE_API_KEY='your_api_key'
-BINANCE_API_SECRET='your_api_secret'
-TELEGRAM_BOT_TOKEN='your_bot_token'
-TELEGRAM_CHAT_ID='your_chat_id'
-```
-
-O puedes crear un archivo `.env`:
-
-```python
-BINANCE_API_KEY=your_api_key
-BINANCE_API_SECRET=your_api_secret
-TELEGRAM_BOT_TOKEN=your_bot_token
-TELEGRAM_CHAT_ID=your_chat_id
-```
-
----
-
-## Uso
-
-### Ejecución local
-
-```python
-python trading_app.py
-```
-
-Esto lanzará:
-- Conexión a Binance
-- Generación de señales
-- Envío de señales a Telegram
-
-### Uso con Docker
-
-```python
-docker build -t Signalio-framework .
-docker run --env-file .env Signalio-framework
-```
-
----
-
-## Roadmap
-
-- [x] Conexión a Binance
-- [x] Envío de señales a Telegram
-- [x] Creación de Platform Connector para facilitar nuevos exchanges
-- [ ] Ejecución automática de órdenes de compra/venta
-- [ ] Soporte para múltiples exchanges (Coinbase, KuCoin, etc.)
-- [ ] Dashboard Web para visualización de señales en tiempo real
-- [ ] Soporte a diferentes estrategias de trading dinámicas
+- Ejecución automática de órdenes de compra/venta en Binance.
+- Soporte multi-exchange (Coinbase, KuCoin, etc.).
+- Sistema de backtesting de estrategias.
+- Dashboard Web para visualización en tiempo real.
+- Optimización de la gestión de eventos y señales.
 
 ---
 
@@ -143,5 +155,11 @@ Las contribuciones son bienvenidas 🚀:
 4. Envía un Pull Request.
 
 Por favor asegúrate de mantener el estilo de codificación existente y agregar pruebas donde sea aplicable.
+
+---
+
+## 📄 Licencia
+
+Este proyecto está licenciado bajo la Licencia MIT.
 
 ---

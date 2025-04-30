@@ -2,7 +2,7 @@ from .interfaces.signal_generator_interface import ISignalGererator
 from .properties.signal_generator_properties import BaseSignalProps, MACrossoverProperties, RSIProperties
 from .signals.signal_ma_crossover import SignalMACrossover
 from .signals.signal_rsi import SignalRSI
-from events.events import DataEvent
+from events.events import DataEvent, SignalEvent
 from data_provider.data_provider import DataProvider
 
 import queue
@@ -35,11 +35,11 @@ class SignalGenerator(ISignalGererator):
 		if signal_event is not None:
 			self.event_queue.put(signal_event)
 
-
-
+	
 
 	def _create_and_put_signal_event(self, signal_event) -> None:
 		
 		# Pone el signal_event en la cola de evetos
 		pass
 		
+	

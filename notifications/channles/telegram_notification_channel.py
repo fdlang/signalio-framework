@@ -15,7 +15,7 @@ class TelegramNotificationchannel(INotificationChannel):
 
     async def async_send_message(self, tittle: str, message: str):
         async with self._bot:
-            await self._bot.send_message(text=f"{tittle}\n{message}", chat_id=self._chat_id)
+            await self._bot.send_message(text=f"{tittle}\n{message}", chat_id=self._chat_id, parse_mode="HTML")
 
 
     def send_message(self, tittle, message):

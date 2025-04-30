@@ -33,19 +33,29 @@ class SignalRSI(ISignalGererator):
 	def compute_rsi(self, prices: pd.Series) -> float:
 
 		deltas = np.diff(prices)
-		gains = np.where(deltas > 0, deltas, 0)
-		losses = np.where(deltas < 0, -deltas, 0) # Convertimos las pérdidas a valores positivos
-		
-		average_gain = np.mean(gains[-self.rsi_period:])
-		average_loss = np.mean(losses[-self.rsi_period:])
 
-		# Aplicamos la formula RSI: rsi = 100 - (100 / (1 + (average_gain / average_loss)))
-		rs = average_gain / average_loss if average_loss > 0 else 0
-		rsi = 100 - (100 / (1 + rs))
+		# Calcula las ganancias y pérdidas
+		gains = np.where(deltas > 0, deltas, 0)
+		losses = np.where(deltas < 0, -deltas, 0) 
+
+		# Inicialización del primer promedio
+		avg_gain = np.mean(gains[-self.rsi_period:])
+		avg_loss = np.mean(losses[-self.rsi_period:])
+
+		# Suavizado de los valores de ganancia y pérdida (tipo Wilder)
+		for i in range(self.rsi_period, len(prices)-1):  # Iteramos sobre el resto de las barras
+			avg_gain = (avg_gain * (self.rsi_period - 1) + gains[i]) / self.rsi_period
+			avg_loss = (avg_loss * (self.rsi_period - 1) + losses[i]) / self.rsi_period
+
+		if avg_loss == 0:
+			rsi = 100
+		else:
+			rs = avg_gain / avg_loss
+			rsi = 100 - (100 / (1 + rs))
 
 		return rsi
-	
 
+	
 
 	def generate_signal(self, data_event:DataEvent, data_provider: DataProvider) -> SignalEvent | None:
 		
@@ -54,12 +64,13 @@ class SignalRSI(ISignalGererator):
 		# Recupera los datos necesarios para el cálculo del RSI		
 		bars = data_provider.get_latest_closed_bars(symbol=symbol, timeframe=self.timeframe, num_bars=self.rsi_period + 1)
 
+		# Calcula el RSI de las últimas velas
+		rsi = self.compute_rsi(bars['Close'].astype(float))
+		
 		if bars is not None and 'Close' in bars.columns and not bars.empty:
-			# Calcula el RSI de las últimas velas
-			rsi = self.compute_rsi(bars['Close'].astype(float))
 			
 			# señal de compra
-			if rsi < self.rsi_lower:
+			if rsi <= 30.0:
 				signal_event = SignalEvent(
 					symbol=symbol,
 					signal="BUY",
@@ -72,7 +83,7 @@ class SignalRSI(ISignalGererator):
 				return signal_event
 
 			# señal de venta
-			elif rsi > self.rsi_upper: 
+			elif rsi >= 70.0: 
 				signal_event = SignalEvent(
 					symbol=symbol,
 					signal="SELL",
