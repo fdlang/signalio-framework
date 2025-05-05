@@ -4,7 +4,7 @@ from events.events import DataEvent, SignalEvent
 from notifications.notification import NotificationService
 
 from typing import Dict, Callable
-from utils.utils import Utils
+from utils.utils import Utils 
 import queue, time
 
 
@@ -45,8 +45,9 @@ class TradingDirector():
         # aquí se puede colocar codigo para generar mensajes de telegram o lo que se necesite. 
         
         if isinstance(event, SignalEvent):
-            self.NOTIFICATIONS.send_notification(tittle=f"Señal de trading", 
-                                                 message=f"Posible señal de {event.signal.value} para {event.symbol} - Precio objetivo: {event.target_price} $ - ID de orden: {event.order_id}")  
+
+            tittle, message = Utils.format_signal_message(event)
+            self.NOTIFICATIONS.send_notification(tittle=tittle, message=message)
         
 
     def _handle_none_event(self, event):
@@ -55,13 +56,14 @@ class TradingDirector():
 
 
     def _handle_unknown_event(self, event):
-        
         print(f"{Utils.dateprint()} - ERROR: Evento desconocido. Terminando ejecución del Framework. - Evento: {event}")
         self.continue_trading = False
 
 
     def execute(self) -> None:
-
+        """
+        Método principal del director de trading. Se encarga de recibir los eventos y procesarlos.
+        """
         while self.continue_trading:
             try:
                 event = self.events_queue.get(block=False) # Cola FIFO (el primer evento que entra es el primero en salir)
@@ -75,6 +77,6 @@ class TradingDirector():
                 else:
                     self._handle_none_event(event)
                     
-            time.sleep(0.01)
+            time.sleep(0.02) # Tiempo de carga para evitar el uso excesivo de CPU (0.2 = 5 veces por segundo)
         
         print("FIN")

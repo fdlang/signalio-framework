@@ -40,4 +40,5 @@ class SignalEvent(BaseEvent):
     signal: SignalType
     target_order: OrderType
     target_price: float
-    order_id: int
+    ref: str
+    rsi: float | None
