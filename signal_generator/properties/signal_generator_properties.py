@@ -15,3 +15,6 @@ class RSIProperties(BaseSignalProps):
 	rsi_period: int
 	rsi_upper: float
 	rsi_lower: float
+
+class RsiMaCrossoverProperties(MACrossoverProperties, RSIProperties):
+	pass
