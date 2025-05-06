@@ -16,5 +16,7 @@ class RSIProperties(BaseSignalProps):
 	rsi_upper: float
 	rsi_lower: float
 
-class RsiMaCrossoverProperties(MACrossoverProperties, RSIProperties):
-	pass
+class RsiMaCrossoverProperties(BaseSignalProps):
+	
+	rsi: RSIProperties
+	ma_crossover:MACrossoverProperties
