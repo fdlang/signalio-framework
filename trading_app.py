@@ -11,7 +11,7 @@ import os
 
 
 if __name__ == "__main__":
-
+    
     try:
         symbols = ['SOLUSDC', 'BTCUSDC', 'ETHUSDC', 'ADAUSDC']
         timeframe = "1m"
@@ -29,7 +29,7 @@ if __name__ == "__main__":
                                         rsi_lower=30)
         
         ma_rsi_properties = RsiMaCrossoverProperties(rsi=rsi_properties, 
-                                                        ma_crossover=macrossover_properties)
+                                                    ma_crossover=macrossover_properties)
                                         
 
         # creación de la cola de eventos principal
