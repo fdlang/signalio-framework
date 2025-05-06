@@ -67,16 +67,11 @@ class SignalRSI(ISignalGererator):
 		Genera una señal de compra o venta en función del RSI.
 		'''
 		symbol = data_event.symbol 
-
-		# Recupera los datos necesarios para el cálculo del RSI		
 		bars = data_provider.get_latest_closed_bars(symbol=symbol, timeframe=self.timeframe, num_bars=self.rsi_period + 1)
-
-		# Calcula el RSI de las últimas velas
 		rsi = self.compute_rsi(bars['Close'].astype(float))
 		
 		if bars is not None and 'Close' in bars.columns and not bars.empty:
 			
-			# señal de compra
 			if rsi <= 30.0:
 				signal_event = SignalEvent(
 					symbol=symbol,
@@ -89,7 +84,6 @@ class SignalRSI(ISignalGererator):
 
 				return signal_event
 
-			# señal de venta
 			elif rsi >= 70.0: 
 				signal_event = SignalEvent(
 					symbol=symbol,
@@ -102,7 +96,7 @@ class SignalRSI(ISignalGererator):
 
 				return signal_event
 			else:
-				# No hay señal de compra o venta
+				
 				return None
 
 
