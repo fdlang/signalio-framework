@@ -1,9 +1,10 @@
 from .interfaces.signal_generator_interface import ISignalGererator
-from .properties.signal_generator_properties import BaseSignalProps, MACrossoverProperties, RSIProperties
+from .properties.signal_generator_properties import BaseSignalProps, MACrossoverProperties, RSIProperties, RsiMaCrossoverProperties
 from .signals.signal_ma_crossover import SignalMACrossover
+from .signals.signal_rsi_ma import RsiMaCrossover
 from .signals.signal_rsi import SignalRSI
-from events.events import DataEvent, SignalEvent
 from data_provider.data_provider import DataProvider
+from events.events import DataEvent, SignalEvent
 
 import queue
 
@@ -23,6 +24,9 @@ class SignalGenerator(ISignalGererator):
 		
 		elif isinstance(signal_props, RSIProperties):
 			return SignalRSI(properties=signal_props)
+		
+		elif isinstance(signal_props, RsiMaCrossoverProperties):
+			return RsiMaCrossover(properties=signal_props)
 
 		else:
 			raise Exception(f'ERROR: No se ha definido un método de señal para las propiedades {signal_props}')
