@@ -2,7 +2,7 @@
 from data_provider.data_provider import DataProvider
 from trading_director.trading_director import TradingDirector
 from signal_generator.signal_generator import SignalGenerator
-from signal_generator.properties.signal_generator_properties import MACrossoverProperties, RSIProperties
+from signal_generator.properties.signal_generator_properties import MACrossoverProperties, RSIProperties, RsiMaCrossoverProperties
 from platform_connector.plaform_connector import PlatformConnector
 from notifications.notification import NotificationService, TelegramNotificationProperties
 
@@ -20,13 +20,16 @@ if __name__ == "__main__":
         fast_ma_perid = 14
 
         macrossover_properties = MACrossoverProperties(timeframe=timeframe, 
-                                                fast_period=fast_ma_perid, 
-                                                slow_period=slow_ma_perid)
+                                                        fast_period=fast_ma_perid, 
+                                                        slow_period=slow_ma_perid)
         
         rsi_properties = RSIProperties(timeframe=timeframe,
                                         rsi_period=14,
                                         rsi_upper=70,
                                         rsi_lower=30)
+        
+        ma_rsi_properties = RsiMaCrossoverProperties(rsi=rsi_properties, 
+                                                        ma_crossover=macrossover_properties)
                                         
 
         # creación de la cola de eventos principal
@@ -42,7 +45,7 @@ if __name__ == "__main__":
         
         SIGNAL_GENERATOR = SignalGenerator(event_queue=events_queue,
                                             data_provider=DATA_PROVIDER,
-                                            signal_properties=rsi_properties)
+                                            signal_properties=ma_rsi_properties)
         
         NOTIFICATIONS = NotificationService(
             properties=TelegramNotificationProperties(token=os.getenv('token'),
