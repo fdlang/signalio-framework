@@ -10,7 +10,7 @@ Su arquitectura escalable y desacoplada permite la fácil integración de nuevos
 
 ## 📚 Tabla de Contenidos
 
-- [🚀 SignalIO Framework](#-signalio-framework)
+- [🚀 Signalio Framework](#-signalio-framework)
 - [🏗 Tecnologías utilizadas](#-tecnologías-utilizadas)
 - [🧠 Arquitectura del Proyecto](#-arquitectura-del-proyecto)
 - [🎨 Patrones de Diseño Aplicados](#-patrones-de-diseño-aplicados)
