@@ -3,8 +3,6 @@ from datetime import datetime, timezone
 from events.events import SignalEvent
 
 
-# Método estatico para poder convertir una divisa a otra
-
 class Utils():
 
 	def __init__(self):
@@ -89,27 +87,32 @@ class Utils():
 	def format_signal_message(event: SignalEvent) -> str:
 
 		market = ""
+		objet_price = ""
 
-		if event.rsi != None and event.rsi > 70:
-			market = "(mercado sobre comprado)"
-		elif event.rsi != None and event.rsi > 30:
-			market = "(mercado sobre vendido)"
+		if event.rsi is not None:
+			if event.rsi > 70:
+				market = "(mercado sobrecomprado)"
+			elif event.rsi < 30:
+				market = "(mercado sobrevendido)"
+			else:
+				market = "(mercado neutral)"
 
-		# Formato título
-		title = f"\U0001F4E3 Señal trading detectada \U0001F440 : {event.ref}"
-
-		# Formato mensaje
+		title = f"📣 Señal de trading detectada 👀"
 		action = 'compra' if event.signal.value == 'BUY' else 'venta'
-		
+		objet_price = 'entrada' if event.signal.value == 'BUY' else 'salida'
+
 		message = (
-			f"\nPosible señal <b>{event.signal.value}</b> para <b>{event.symbol}</b>"
-			f"\n- \U0001F3AF Precio de {action} {event.target_price} $."
+			f"\n<b>Atención:</b> Se ha detectado una posible señal de <b>{action.upper()}</b> para <b>{event.symbol}</b>.\n\n"
+			f"• Estrategia aplicada: Cruce de Medias Móviles (MA) y RSI\n"
+			f"• 🎯 Precio de {objet_price}: <b>{event.target_price:.2f} USD</b>\n"
 		)
 
-		# Agrega RSI si existe
 		if event.rsi is not None:
-			rsi_value = round(event.rsi,2)
-			rsi_emoji = "\U0001F525" if rsi_value > 70 or rsi_value < 30 else "\U0001F4A5"
-			message += f" \n- {rsi_emoji} RSI {rsi_value} {market}"
+			rsi_value = round(event.rsi, 2)
+			rsi_emoji = "🔥" if rsi_value > 70 or rsi_value < 30 else "💥"
+			message += f"• {rsi_emoji} RSI: <b>{rsi_value}</b> {market}\n"
+
+		message += f"• 🕒 Hora de generación: {Utils.dateprint()}\n"
+		message += "\n⚠️ No es una recomendación de inversión, solo un análisis técnico."
 
 		return title, message
