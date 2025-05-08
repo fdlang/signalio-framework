@@ -44,6 +44,7 @@ class SignalMACrossover(ISignalGererator):
 					target_price=float(bars['Close'].iloc[-1]),
 					ref="MA Crossover",
 					rsi=None,
+					timeframe=self.timeframe,
 				)
 				return signal_event
 
@@ -56,6 +57,7 @@ class SignalMACrossover(ISignalGererator):
 					target_price=float(bars['Close'].iloc[-1]),
 					ref="MA Crossover",
 					rsi=None,
+					timeframe=self.timeframe,
 				)
 				return signal_event
 			else:

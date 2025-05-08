@@ -80,6 +80,7 @@ class SignalRSI(ISignalGererator):
 					target_price=float(bars['Close'].iloc[-1]),
 					ref="RSI",
 					rsi=rsi,
+					timeframe=self.timeframe,
 				)
 
 				return signal_event
@@ -92,6 +93,7 @@ class SignalRSI(ISignalGererator):
 					target_price=float(bars['Close'].iloc[-1]),
 					ref="RSI",
 					rsi=rsi,
+					timeframe=self.timeframe
 				)
 
 				return signal_event

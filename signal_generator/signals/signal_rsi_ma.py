@@ -11,6 +11,7 @@ class RsiMaCrossover(ISignalGererator):
 	def __init__(self, properties: RsiMaCrossoverProperties):
 
 		self.properties = properties
+		
 
 	def generate_signal(self, data_event: DataEvent, data_provider: DataProvider) -> SignalEvent | None:
 		
@@ -26,12 +27,13 @@ class RsiMaCrossover(ISignalGererator):
 		):
 			
 			signal_event = SignalEvent(event_type=signal_event_ma.event_type,
-				   symbol=signal_event_ma.symbol,
-				   signal=signal_event_ma.signal,
-				   target_order="MARKET",
-				   target_price=signal_event_rsi.target_price,
-				   ref="RSI_MA",
-				   rsi=signal_event_rsi.rsi,)
+										symbol=signal_event_ma.symbol,
+										signal=signal_event_ma.signal,
+										target_order="MARKET",
+										target_price=signal_event_rsi.target_price,
+										ref="RSI_MA",
+										rsi=signal_event_rsi.rsi,
+										timeframe=rsi.timeframe)
 			
 			return signal_event
 		

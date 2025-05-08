@@ -39,9 +39,9 @@ if __name__ == "__main__":
         CONNECT = PlatformConnector(symbols=symbols) 
         
         DATA_PROVIDER = DataProvider(CONNECT, 
-                            events_queue=events_queue, 
-                            symbol_list=symbols, 
-                            timeframe=timeframe)
+                                        events_queue=events_queue, 
+                                        symbol_list=symbols, 
+                                        timeframe=timeframe)
         
         SIGNAL_GENERATOR = SignalGenerator(event_queue=events_queue,
                                             data_provider=DATA_PROVIDER,

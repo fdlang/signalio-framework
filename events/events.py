@@ -42,3 +42,4 @@ class SignalEvent(BaseEvent):
     target_price: float
     ref: str
     rsi: float | None
+    timeframe: str
