@@ -99,7 +99,7 @@ class Utils():
 			else:
 				market = "(mercado neutral)"
 
-		title = f"📣 Señal de trading detectada 👀"
+		title = f"\n📣 Señal de trading detectada 👀"
 		action = 'compra' if event.signal.value == 'BUY' else 'venta'
 		objet_price = 'entrada' if event.signal.value == 'BUY' else 'salida'
 
@@ -116,6 +116,6 @@ class Utils():
 			message += f"• {rsi_emoji} RSI: <b>{rsi_value}</b> {market}\n"
 
 		message += f"• 🕒 Hora de generación: {Utils.dateprint_simple()}\n"
-		message += "\n⚠️ No es una recomendación de inversión, solo un análisis técnico."
+		message += "\n⚠️ No es una recomendación de inversión, solo un análisis técnico.\n"
 
 		return title, message
