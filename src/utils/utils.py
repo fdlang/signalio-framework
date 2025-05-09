@@ -20,7 +20,6 @@ class Utils():
 		from_ccy = from_ccy.upper()
 		to_ccy = to_ccy.upper()
 
-		# Buscar el símbolo de cambio
 		fx_symbol_candidates = [symbol for symbol in all_fx_symbol if from_ccy in symbol and to_ccy in symbol]
 		
 		if not fx_symbol_candidates:
@@ -29,7 +28,6 @@ class Utils():
 		fx_symbol = fx_symbol_candidates[0]
 
 		try:
-			# Obtener el último precio del ticker
 			tick = Client().get_ticker(symbol=fx_symbol)
 
 			if tick is None:
@@ -82,6 +80,10 @@ class Utils():
 	def dateprint() -> str: 
 		return datetime.now().strftime("%d/%m/%Y %H:%M:%S.%f")  # format: 12/10/2024 20:30:234
 	
+	@staticmethod
+	def dateprint_simple() -> str: 
+		return datetime.now().strftime("%d/%m/%Y %H:%M:%S")  # format: 12/10/2024 20:30:23
+	
 
 	@staticmethod
 	def format_signal_message(event: SignalEvent) -> str:
@@ -104,7 +106,7 @@ class Utils():
 		message = (
 			f"\n<b>Atención:</b> Se ha detectado una posible señal de <b>{action.upper()}</b> para <b>{event.symbol}</b>.\n\n"
 			f"• Temporalidad de {event.timeframe}\n"
-			f"• Estrategia aplicada: Cruce de Medias Móviles (MA) y RSI\n"
+			f"• Estrategia aplicada: Cruce de Medias Móviles (MA) + RSI\n"
 			f"• 🎯 Precio de {objet_price}: <b>{event.target_price:.2f} USD</b>\n"
 		)
 
@@ -113,7 +115,7 @@ class Utils():
 			rsi_emoji = "🔥" if rsi_value > 70 or rsi_value < 30 else "💥"
 			message += f"• {rsi_emoji} RSI: <b>{rsi_value}</b> {market}\n"
 
-		message += f"• 🕒 Hora de generación: {Utils.dateprint()}\n"
+		message += f"• 🕒 Hora de generación: {Utils.dateprint_simple()}\n"
 		message += "\n⚠️ No es una recomendación de inversión, solo un análisis técnico."
 
 		return title, message
