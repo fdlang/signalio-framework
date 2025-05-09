@@ -11,23 +11,23 @@ class SignalRSI(ISignalGenerator):
 	
 	
 	def __init__(self, properties: RSIProperties):
-
 		self.timeframe = properties.timeframe
-		self.rsi_period = properties.rsi_period if properties.rsi_period > 2 else 2 # El periodo debe ser mayor a 2 para evitar errores en el cálculo del RSI
-		self.rsi_upper = properties.rsi_upper if properties.rsi_upper < 100 else 100 # El límite superior del RSI no puede ser mayor a 100
-		
-		if properties.rsi_upper > 100 or properties.rsi_upper < 0:
-			self.rsi_upper = 70 
-		else:
-			self.rsi_upper = properties.rsi_upper
+		self.rsi_period = max(properties.rsi_period, 2)  # Asegura un valor mínimo de 2
 
-		if properties.rsi_lower > 100 or properties.rsi_lower < 0:
-			self.rsi_lower = 30 
+		if 0 <= properties.rsi_upper <= 100:
+			self.rsi_upper = properties.rsi_upper
 		else:
+			self.rsi_upper = 70
+
+		if 0 <= properties.rsi_lower <= 100:
 			self.rsi_lower = properties.rsi_lower
+		else:
+			self.rsi_lower = 30
 
 		if self.rsi_lower >= self.rsi_upper:
-			raise Exception(f"ERROR: El límite inferior del RSI ({self.rsi_lower}) no puede ser mayor o igual al límite superior ({self.rsi_upper}).")
+			raise ValueError(
+				f"ERROR: El límite inferior del RSI ({self.rsi_lower}) no puede ser mayor o igual al límite superior ({self.rsi_upper})."
+			)
 
 
 	def compute_rsi(self, prices: pd.Series) -> float:
@@ -72,7 +72,7 @@ class SignalRSI(ISignalGenerator):
 		
 		if bars is not None and 'Close' in bars.columns and not bars.empty:
 			
-			if rsi <= 30.0:
+			if rsi <= self.rsi_lower:
 				signal_event = SignalEvent(
 					symbol=symbol,
 					signal="BUY",
@@ -85,7 +85,7 @@ class SignalRSI(ISignalGenerator):
 
 				return signal_event
 
-			elif rsi >= 70.0: 
+			elif rsi >= self.rsi_upper: 
 				signal_event = SignalEvent(
 					symbol=symbol,
 					signal="SELL",
