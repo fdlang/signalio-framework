@@ -116,6 +116,6 @@ class Utils():
 			message += f"• {rsi_emoji} RSI: <b>{rsi_value}</b> {market}\n"
 
 		message += f"• 🕒 Hora de generación: {Utils.dateprint_simple()}\n"
-		message += "\n⚠️ No es una recomendación de inversión, solo un análisis técnico.\n"
+		message += "\n⚠️ Este contenido no constituye una recomendación de inversión; se trata únicamente de un análisis técnico.\n"
 
 		return title, message
