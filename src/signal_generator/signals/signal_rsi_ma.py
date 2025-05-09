@@ -36,7 +36,7 @@ class RsiMaCrossover(ISignalGenerator):
 										target_order="MARKET",
 										target_price=signal_event_rsi.target_price,
 										ref="RSI_MA",
-										rsi=signal_event_rsi.rsi,
+ 										rsi=signal_event_rsi.rsi,
 										timeframe=rsi.timeframe)
 			
 			return signal_event
