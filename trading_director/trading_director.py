@@ -1,5 +1,5 @@
 from data_provider.data_provider import DataProvider
-from signal_generator.interfaces.signal_generator_interface import ISignalGererator
+from signal_generator.interfaces.signal_generator_interface import ISignalGenerator
 from events.events import DataEvent, SignalEvent
 from notifications.notification import NotificationService
 
@@ -10,7 +10,7 @@ import queue, time
 
 class TradingDirector():
 
-    def __init__(self, events_queue: queue.Queue, data: DataProvider, signal_generator: ISignalGererator, 
+    def __init__(self, events_queue: queue.Queue, data: DataProvider, signal_generator: ISignalGenerator, 
                  notification_service: NotificationService):
 
         self.events_queue = events_queue

@@ -1,4 +1,4 @@
-from .interfaces.signal_generator_interface import ISignalGererator
+from .interfaces.signal_generator_interface import ISignalGenerator
 from .properties.signal_generator_properties import BaseSignalProps, MACrossoverProperties, RSIProperties, RsiMaCrossoverProperties
 from .signals.signal_ma_crossover import SignalMACrossover
 from .signals.signal_rsi_ma import RsiMaCrossover
@@ -9,7 +9,7 @@ from events.events import DataEvent, SignalEvent
 import queue
 
 
-class SignalGenerator(ISignalGererator):
+class SignalGenerator(ISignalGenerator):
 	def __init__(self, event_queue: queue, data_provider: DataProvider, signal_properties: BaseSignalProps) -> None:
 		
 		self.event_queue = event_queue
@@ -17,7 +17,7 @@ class SignalGenerator(ISignalGererator):
 		self.signal_generator_method = self._get_signal_generator_method(signal_properties)
 
 
-	def _get_signal_generator_method(self, signal_props: BaseSignalProps) -> ISignalGererator:
+	def _get_signal_generator_method(self, signal_props: BaseSignalProps) -> ISignalGenerator:
 		
 		if isinstance(signal_props, MACrossoverProperties):
 			return SignalMACrossover(properties=signal_props)
@@ -40,9 +40,5 @@ class SignalGenerator(ISignalGererator):
 			self.event_queue.put(signal_event)
 	
 
-	def _create_and_put_signal_event(self, signal_event) -> None:
-		
-		# Pone el signal_event en la cola de evetos
-		pass
-		
+
 	

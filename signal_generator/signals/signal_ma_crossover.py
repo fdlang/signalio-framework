@@ -1,10 +1,10 @@
-from ..interfaces.signal_generator_interface import ISignalGererator
+from ..interfaces.signal_generator_interface import ISignalGenerator
 from ..properties.signal_generator_properties import MACrossoverProperties
 from data_provider.data_provider import DataProvider
 from events.events import DataEvent, SignalEvent
 
 
-class SignalMACrossover(ISignalGererator):
+class SignalMACrossover(ISignalGenerator):
 	
 	
 	def __init__(self, properties: MACrossoverProperties):

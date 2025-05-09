@@ -103,7 +103,8 @@ class Utils():
 
 		message = (
 			f"\n<b>Atención:</b> Se ha detectado una posible señal de <b>{action.upper()}</b> para <b>{event.symbol}</b>.\n\n"
-			f"• Estrategia aplicada en velas de {event.timeframe}: Cruce de Medias Móviles (MA) y RSI\n"
+			f"• Temporalidad de {event.timeframe}\n"
+			f"• Estrategia aplicada: Cruce de Medias Móviles (MA) y RSI\n"
 			f"• 🎯 Precio de {objet_price}: <b>{event.target_price:.2f} USD</b>\n"
 		)
 
