@@ -16,9 +16,10 @@ class RsiMaCrossover(ISignalGenerator):
 	def _is_valid_combination(self, signal_event_ma: SignalEvent, signal_event_rsi: SignalEvent) -> bool:
 	
 		return (
-			signal_event_ma and signal_event_ma.signal == "BUY" and
-			signal_event_rsi is not None or signal_event_rsi.signal == "BUY"
+			isinstance(signal_event_ma, SignalEvent) and signal_event_ma.signal == "BUY" and
+			isinstance(signal_event_rsi, SignalEvent) and signal_event_rsi.signal == "BUY"
 		)
+
 	
 
 	def generate_signal(self, data_event: DataEvent, data_provider: DataProvider) -> SignalEvent | None:
