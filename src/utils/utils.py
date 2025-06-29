@@ -1,6 +1,6 @@
 from binance.client import Client
 from datetime import datetime, timezone
-from events.events import SignalEvent
+from src.events.events import SignalEvent
 
 
 class Utils():

@@ -1,8 +1,8 @@
 import pandas as pd
+from src.events.events import DataEvent
+from src.platform_connector.plaform_connector import PlatformConnector
 from typing import Dict
-from events.events import DataEvent
 from datetime import datetime, timezone
-from platform_connector.plaform_connector import PlatformConnector
 from binance.exceptions import BinanceAPIException, BinanceRequestException
 from queue import Queue
 

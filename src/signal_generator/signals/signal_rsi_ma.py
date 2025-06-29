@@ -1,9 +1,9 @@
-from ..interfaces.signal_generator_interface import ISignalGenerator
-from ..properties.signal_generator_properties import RsiMaCrossoverProperties
-from .signal_ma_crossover import SignalMACrossover
-from .signal_rsi import SignalRSI
-from data_provider.data_provider import DataProvider
-from events.events import DataEvent, SignalEvent
+from src.signal_generator.interfaces.signal_generator_interface import ISignalGenerator
+from src.signal_generator.properties.signal_generator_properties import RsiMaCrossoverProperties
+from src.signal_generator.signals.signal_ma_crossover import SignalMACrossover
+from src.signal_generator.signals.signal_rsi import SignalRSI
+from src.data_provider.data_provider import DataProvider
+from src.events.events import DataEvent, SignalEvent
 
 
 class RsiMaCrossover(ISignalGenerator):
@@ -15,15 +15,19 @@ class RsiMaCrossover(ISignalGenerator):
 
 	def _is_valid_combination(self, signal_event_ma: SignalEvent, signal_event_rsi: SignalEvent) -> bool:
 	
-		return (
-			isinstance(signal_event_ma, SignalEvent) and signal_event_ma.signal == "BUY" and
-			isinstance(signal_event_rsi, SignalEvent) and signal_event_rsi.signal == "BUY"
-		)
-
+		if isinstance(signal_event_ma, SignalEvent) and signal_event_ma.signal == "BUY" and \
+			isinstance(signal_event_rsi, SignalEvent) and signal_event_rsi.signal == "BUY":
+			return True
+		
+		elif isinstance(signal_event_ma, SignalEvent) and signal_event_ma.signal == "SELL" and \
+			isinstance(signal_event_rsi, SignalEvent) and signal_event_rsi.signal == "SELL":
+			return True
+		
+		return False
 	
 
 	def generate_signal(self, data_event: DataEvent, data_provider: DataProvider) -> SignalEvent | None:
-		
+
 		ma_crosover = SignalMACrossover(properties=self.properties.ma_crossover)
 		rsi = SignalRSI(self.properties.rsi)
 

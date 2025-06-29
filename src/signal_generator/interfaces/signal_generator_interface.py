@@ -1,7 +1,7 @@
 from typing import Protocol
-from events.events import DataEvent
-from events.events import SignalEvent
-from data_provider.data_provider import DataProvider
+from src.events.events import DataEvent
+from src.events.events import SignalEvent
+from src.data_provider.data_provider import DataProvider
 
 
 class ISignalGenerator(Protocol):

@@ -1,6 +1,6 @@
-from .interfaces.notification_channel import INotificationChannel
-from .properties.properties import TelegramNotificationProperties, NotificationChannelBaseProperties
-from .channles.telegram_notification_channel import TelegramNotificationchannel
+from src.notifications.interfaces.notification_channel import INotificationChannel
+from src.notifications.properties.properties import TelegramNotificationProperties, NotificationChannelBaseProperties
+from src.notifications.channels.telegram_notification_channel import TelegramNotificationchannel
 
 class NotificationService():
 

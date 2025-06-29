@@ -2,7 +2,7 @@ import os
 from binance.client import Client
 from binance.exceptions import BinanceAPIException, BinanceRequestException
 from dotenv import load_dotenv, find_dotenv
-from utils.utils import Utils
+from src.utils.utils import Utils
 
 class PlatformConnector():
 	def __init__(self, symbols:list):

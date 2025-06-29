@@ -1,10 +1,9 @@
-
-from data_provider.data_provider import DataProvider
-from trading_director.trading_director import TradingDirector
-from signal_generator.signal_generator import SignalGenerator
-from signal_generator.properties.signal_generator_properties import MACrossoverProperties, RSIProperties, RsiMaCrossoverProperties
-from platform_connector.plaform_connector import PlatformConnector
-from notifications.notification import NotificationService, TelegramNotificationProperties
+from src.data_provider.data_provider import DataProvider
+from src.trading_director.trading_director import TradingDirector
+from src.signal_generator.signal_generator import SignalGenerator
+from src.signal_generator.properties.signal_generator_properties import MACrossoverProperties, RSIProperties, RsiMaCrossoverProperties
+from src.platform_connector.plaform_connector import PlatformConnector
+from src.notifications.notification import NotificationService, TelegramNotificationProperties
 
 from queue import Queue
 import os

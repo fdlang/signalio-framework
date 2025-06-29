@@ -1,5 +1,5 @@
-from ..interfaces.notification_channel import INotificationChannel
-from ..properties.properties import TelegramNotificationProperties
+from src.notifications.interfaces.notification_channel import INotificationChannel
+from src.notifications.properties.properties import TelegramNotificationProperties
 import telegram
 import asyncio
 

@@ -1,7 +1,7 @@
-from ..interfaces.signal_generator_interface import ISignalGenerator
-from data_provider.data_provider import DataProvider
-from events.events import DataEvent, SignalEvent
-from ..properties.signal_generator_properties import RSIProperties
+from src.signal_generator.interfaces.signal_generator_interface import ISignalGenerator
+from src.data_provider.data_provider import DataProvider
+from src.events.events import DataEvent, SignalEvent
+from src.signal_generator.properties.signal_generator_properties import RSIProperties
 
 import pandas as pd
 import numpy as np

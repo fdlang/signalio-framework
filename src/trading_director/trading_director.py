@@ -1,10 +1,10 @@
-from data_provider.data_provider import DataProvider
-from signal_generator.interfaces.signal_generator_interface import ISignalGenerator
-from events.events import DataEvent, SignalEvent
-from notifications.notification import NotificationService
+from src.data_provider.data_provider import DataProvider
+from src.signal_generator.interfaces.signal_generator_interface import ISignalGenerator
+from src.events.events import DataEvent, SignalEvent
+from src.notifications.notification import NotificationService
 
 from typing import Dict, Callable
-from utils.utils import Utils 
+from src.utils.utils import Utils 
 import queue, time
 
 
