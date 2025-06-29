@@ -11,7 +11,7 @@ class DataProvider():
 
 	def __init__(self, connect:PlatformConnector, events_queue: Queue, symbol_list: list, timeframe: str):
 		self.client = connect.client
-		self.events_queue = events_queue  # recibe una cola de eventos
+		self.events_queue = events_queue  
 		self.symbols: list = symbol_list
 		self.timeframe: str = timeframe
 
@@ -21,7 +21,6 @@ class DataProvider():
 
 	def _map_timeframes(self,timeframe: str) -> int:
 
-		# crea un diccionario para temporalidades
 		timeframe_mapping = {
 			'1m':self.client.KLINE_INTERVAL_1MINUTE,
 			'3m':self.client.KLINE_INTERVAL_3MINUTE,
@@ -52,7 +51,7 @@ class DataProvider():
 		'''
 		# Define los paramertros adecuados
 		interval = self._map_timeframes(timeframe) # intervalo de tiempo para las velas 
-		limit = 2 # limite de velas
+		limit = 2 
 
 		try:
 			# Recupera los datos de las ultimas velas
