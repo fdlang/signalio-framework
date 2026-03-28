@@ -8,8 +8,8 @@ import numpy as np
 
 
 class SignalRSI(ISignalGenerator):
-	
-	
+
+
 	def __init__(self, properties: RSIProperties):
 		self.timeframe = properties.timeframe
 		self.rsi_period = max(properties.rsi_period, 2)  # Asegura un valor mínimo de 2
@@ -41,65 +41,62 @@ class SignalRSI(ISignalGenerator):
 
 		# Calcula las ganancias y pérdidas
 		gains = np.where(deltas > 0, deltas, 0)
-		losses = np.where(deltas < 0, -deltas, 0) 
+		losses = np.where(deltas < 0, -deltas, 0)
 
-		# Inicialización del primer promedio
-		avg_gain = np.mean(gains[-self.rsi_period:])
-		avg_loss = np.mean(losses[-self.rsi_period:])
+		# Inicialización del primer promedio con los primeros rsi_period deltas
+		avg_gain = np.mean(gains[:self.rsi_period])
+		avg_loss = np.mean(losses[:self.rsi_period])
 
-		# Suavizado de los valores de ganancia y pérdida (tipo Wilder)
-		for i in range(self.rsi_period, len(prices)-1):  # Iteramos sobre el resto de las barras
+		# FIX: el bucle itera sobre los deltas restantes (gains/losses),
+		# no sobre prices. El rango correcto es [rsi_period, len(deltas)]
+		# para procesar todos los deltas tras la inicialización sin saltarse ninguno.
+		for i in range(self.rsi_period, len(deltas)):
 			avg_gain = (avg_gain * (self.rsi_period - 1) + gains[i]) / self.rsi_period
 			avg_loss = (avg_loss * (self.rsi_period - 1) + losses[i]) / self.rsi_period
 
 		if avg_loss == 0:
-			rsi = 100
+			rsi = 100.0
 		else:
 			rs = avg_gain / avg_loss
-			rsi = 100 - (100 / (1 + rs))
+			rsi = 100.0 - (100.0 / (1.0 + rs))
 
 		return rsi
 
-	
 
-	def generate_signal(self, data_event:DataEvent, data_provider: DataProvider) -> SignalEvent | None:
+	def generate_signal(self, data_event: DataEvent, data_provider: DataProvider) -> SignalEvent | None:
 		'''
 		Genera una señal de compra o venta en función del RSI.
 		'''
-		symbol = data_event.symbol 
+		symbol = data_event.symbol
 		bars = data_provider.get_latest_closed_bars(symbol=symbol, timeframe=self.timeframe, num_bars=self.rsi_period + 1)
+
+		# FIX: validar el DataFrame ANTES de llamar a compute_rsi,
+		# evitando que np.diff reciba una serie vacía y produzca NaN o error.
+		if bars is None or bars.empty or 'Close' not in bars.columns:
+			return None
+
 		rsi = self.compute_rsi(bars['Close'].astype(float))
-		
-		if bars is not None and 'Close' in bars.columns and not bars.empty:
-			
-			if rsi <= self.rsi_lower:
-				signal_event = SignalEvent(
-					symbol=symbol,
-					signal="BUY",
-					target_order="MARKET",
-					target_price=float(bars['Close'].iloc[-1]),
-					ref="RSI",
-					rsi=rsi,
-					timeframe=self.timeframe,
-				)
 
-				return signal_event
+		if rsi <= self.rsi_lower:
+			return SignalEvent(
+				symbol=symbol,
+				signal="BUY",
+				target_order="MARKET",
+				target_price=float(bars['Close'].iloc[-1]),
+				ref="RSI",
+				rsi=rsi,
+				timeframe=self.timeframe,
+			)
 
-			elif rsi >= self.rsi_upper: 
-				signal_event = SignalEvent(
-					symbol=symbol,
-					signal="SELL",
-					target_order="MARKET",
-					target_price=float(bars['Close'].iloc[-1]),
-					ref="RSI",
-					rsi=rsi,
-					timeframe=self.timeframe
-				)
+		elif rsi >= self.rsi_upper:
+			return SignalEvent(
+				symbol=symbol,
+				signal="SELL",
+				target_order="MARKET",
+				target_price=float(bars['Close'].iloc[-1]),
+				ref="RSI",
+				rsi=rsi,
+				timeframe=self.timeframe,
+			)
 
-				return signal_event
-			else:
-				
-				return None
-
-
-		
+		return None

@@ -13,7 +13,7 @@ if __name__ == "__main__":
 
     try:
         symbols = ['SOLUSDC', 'BTCUSDC', 'ETHUSDC', 'ADAUSDC','FETUSDC']
-        timeframe = "4h"
+        timeframe = "1m"
         new_order_id = 12345
         slow_ma_perid = 50
         fast_ma_perid = 14
